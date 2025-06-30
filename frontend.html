@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>CSS Template</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script>
+  function alartform(){
+    let firstname = document.getElementById("firstname").value;
+    let lastname = document.getElementById("lastname").value;
+    let subject = document.getElementById("subject").value;
+    alert("ชื่อ, " + firstname + "\nอีเมล: " + lastname + "\nข้อความ: " + subject);
+    return false;
+  }
+  function toggleTheme() {
+  document.body.classList.toggle("dark-theme");
+
+  const button = document.querySelector('.theme-toggle');
+  if (document.body.classList.contains("dark-theme")) {
+    button.textContent = "🌞";
+  } else {
+    button.textContent = "🌙";
+  }
+}
+</script>
+</head>
+<body>
+<div class="header">
+  <div class="head">ทอทอง เทพอารักษ์</div><br>
+  <div class="head">นักพัฒนาเว็บไซต์ Full-Stack Developer</div><br>
+  <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+</div>
+<div class="topnav">
+  <a href="#about">เกียวกับ</a>
+  <a href="#skill">ทักษะ</a>
+  <a href="#performance">ผลงาน</a>
+  <a href="#contact">ติดต่อ</a>
+</div>
+<div class="about_bg">
+  <div class="container">
+    <div class="about" id="about">
+      <div class="container_head"><i class="fas fa-user"></i> เกี่ยวกับฉัน</div><br><br>
+      <div class="container_des">ฉันเป็นนักพัฒนาเว็บไซต์ที่มีประสบการณ์ทั้ง Frontend และ Backend</div>
+    </div>
+  </div>
+</div>
+<div class="skill_bg">
+  <div class="container">
+    <div class="skill" id="skill">
+      <div class="container_head"><i class="fa-solid fa-book"></i> ทักษะของฉัน</div><br><br>
+      <ul>
+        <li>HTML</li>
+        <li>CSS</li>
+        <li>JavaScript</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="performance_bg">
+  <div class="container">
+    <div class="performance" id="performance">
+      <div class="container_head"><i class="fa-solid fa-chart-bar"></i> ผลงาน</div><br><br>
+       <ul>
+        <li>Numerical calculator Web App</li>
+        <li>Coffee Shop Web use React</li>
+        <li>Coffee Shop Web use PHP</li>
+        <li>Stock trading bot predicts prices with AI</li>
+        <li>Digital twin using point cloud and mesh data</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="contact_bg">
+  <div class="container">
+    <div class="contact" id="contact">
+      <div class="container_head"><i class="fa-solid fa-address-card"></i> ติดต่อฉัน</div><br><br>
+        <form onsubmit="return alartform()">
+          <input type="text" id="firstname" name="firstname" placeholder="ชื่อของคุณ" required>
+          <input type="text" id="lastname" name="lastname" placeholder="อีเมลของคุณ" required>
+          <textarea id="subject" name="subject" placeholder="ข้อความของคุณ" style="height:100px" required></textarea>
+
+          <input type="submit" value="ส่งข้อความ">
+        </form>
+      </div>
+  </div>  
+</div> 
+
+
+
+</body>
+</html>
+
