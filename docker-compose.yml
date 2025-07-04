@@ -1,7 +1,7 @@
 version: '3.9'
 
 services:
-  db:
+  sql_server:
     image: mcr.microsoft.com/mssql/server:2019-latest
     container_name: sql_server
     environment:
@@ -18,12 +18,12 @@ services:
     environment:
       - DB_USER=sa
       - DB_PASSWORD=DmX08775416421
-      - DB_SERVER=db
+      - DB_SERVER=sql_server
       - DB_DATABASE=stock_t
     ports:
       - "3001:3001"
     depends_on:
-      - db
+      - sql_server
     networks:
       - app-network
 
