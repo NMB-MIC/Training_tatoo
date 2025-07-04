@@ -41,7 +41,9 @@ services:
       - server
     networks:
       - app-network
-
+  depends_on:
+    db:
+      condition: service_healthy  
 networks:
   app-network:
     driver: bridge
