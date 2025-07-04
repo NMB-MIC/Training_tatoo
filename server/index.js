@@ -203,7 +203,7 @@ app.post('/api/login', async (req, res) => {
     const result = await sql.query`
       SELECT * FROM [user] 
       WHERE UserName = ${username} AND Password = ${password}
-    // `;
+    `;
 
     if (result.recordset.length > 0) {
       res.json({ success: true, username: result.recordset[0].UserName,  password: result.recordset[0].Password });
