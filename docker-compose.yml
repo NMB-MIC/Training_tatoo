@@ -18,7 +18,7 @@ services:
     environment:
       - DB_USER=sa
       - DB_PASSWORD=DmX08775416421
-      - DB_SERVER=192.168.100.124
+      - DB_SERVER=db
       - DB_DATABASE=stock_t
     ports:
       - "3001:3001"
