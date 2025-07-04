@@ -24,7 +24,12 @@ services:
       - "3001:3001"
     depends_on:
       - db
-    networks:
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P DmX08775416421 -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      networks:
       - app-network
 
   client:
