@@ -1,49 +1,31 @@
-version: '3.9'
+db:
+  image: mcr.microsoft.com/mssql/server:2019-latest
+  container_name: sql_server
+  environment:
+    - SA_PASSWORD=DmX08775416421
+    - ACCEPT_EULA=Y
+  ports:
+    - "1433:1433"
+  healthcheck:
+    test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P DmX08775416421 -Q "SELECT 1" || exit 1
+    interval: 10s
+    timeout: 5s
+    retries: 10
+  networks:
+    - app-network
 
-services:
-  db:
-    image: mcr.microsoft.com/mssql/server:2019-latest
-    container_name: sql_server
-    environment:
-      - SA_PASSWORD=DmX08775416421
-      - ACCEPT_EULA=Y
-    ports:
-      - "1433:1433"
-    networks:
-      - app-network
-
-  server:
-    build: ./server
-    container_name: app_server
-    environment:
-      - DB_USER=sa
-      - DB_PASSWORD=DmX08775416421
-      - DB_SERVER=db
-      - DB_DATABASE=stock_t
-    ports:
-      - "3001:3001"
-    depends_on:
-      - db
-    healthcheck:
-      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P DmX08775416421 -Q "SELECT 1" || exit 1
-      interval: 10s
-      timeout: 5s
-      retries: 30
-      networks:
-      - app-network
-
-  client:
-    build: ./client
-    container_name: app_client
-    ports:
-      - "80:80"
-    depends_on:
-      - server
-    networks:
-      - app-network
+server:
+  build: ./server
+  container_name: app_server
+  environment:
+    - DB_USER=sa
+    - DB_PASSWORD=DmX08775416421
+    - DB_SERVER=db
+    - DB_DATABASE=stock_t
+  ports:
+    - "3001:3001"
   depends_on:
     db:
-      condition: service_healthy  
-networks:
-  app-network:
-    driver: bridge
+      condition: service_healthy
+  networks:
+    - app-network
