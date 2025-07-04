@@ -43,7 +43,7 @@ async function ensureDatabaseAndTables() {
     const dbResult = await sql.query`SELECT name FROM sys.databases WHERE name = 'stock_t'`;
     if (dbResult.recordset.length === 0) {
       console.log('check db');
-      await sql.query(`CREATE DATABASE stock_t GO`);
+      await sql.query(`CREATE DATABASE stock_t`);
       console.log('create db');
     } else {
       console.log('ready');
@@ -55,7 +55,7 @@ async function ensureDatabaseAndTables() {
 
     await sql.query(`
       IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='user' AND xtype='U')
-      CREATE TABLE stock_t.dbo.[user] (
+      CREATE TABLE [user] (
         EmpID INT IDENTITY(1,1) PRIMARY KEY,
         EMP_no VARCHAR(20) NOT NULL,
         UserName VARCHAR(50) NOT NULL,
@@ -67,7 +67,7 @@ async function ensureDatabaseAndTables() {
 
     await sql.query(`
       IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Category' AND xtype='U')
-      CREATE TABLE stock_t.dbo.Category (
+      CREATE TABLE Category (
         CategoryID INT IDENTITY(1,1) PRIMARY KEY,
         CategoryName VARCHAR(100),
         registered_at DATETIME DEFAULT GETDATE(),
@@ -77,7 +77,7 @@ async function ensureDatabaseAndTables() {
 
     await sql.query(`
       IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='itemMaster' AND xtype='U')
-      CREATE TABLE stock_t.dbo.itemMaster (
+      CREATE TABLE itemMaster (
         ItemID INT IDENTITY(1,1) PRIMARY KEY,
         ItemName VARCHAR(255),
         SerialNo VARCHAR(100),
@@ -92,7 +92,7 @@ async function ensureDatabaseAndTables() {
 
     await sql.query(`
       IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='OperationType' AND xtype='U')
-      CREATE TABLE stock_t.dbo.OperationType (
+      CREATE TABLE OperationType (
         OperationID INT IDENTITY(1,1) PRIMARY KEY,
         OperationName VARCHAR(100),
         registered_at DATETIME DEFAULT GETDATE(),
@@ -102,7 +102,7 @@ async function ensureDatabaseAndTables() {
 
     await sql.query(`
       IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ProductBalance' AND xtype='U')
-      CREATE TABLE stock_t.dbo.ProductBalance (
+      CREATE TABLE ProductBalance (
         ProductBalanceID INT IDENTITY(1,1) PRIMARY KEY,
         ItemID INT,
         EmpID INT,
@@ -120,7 +120,7 @@ async function ensureDatabaseAndTables() {
 
     await sql.query(`
       IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ProductLog' AND xtype='U')
-      CREATE TABLE stock_t.dbo.ProductLog (
+      CREATE TABLE ProductLog (
         ProductLogID INT IDENTITY(1,1) PRIMARY KEY,
         ItemID INT,
         ItemName VARCHAR(255),
