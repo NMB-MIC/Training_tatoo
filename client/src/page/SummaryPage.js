@@ -11,13 +11,13 @@ import {
   Paper,
   CircularProgress,
 } from '@mui/material';
-
+const API_URL = process.env.REACT_APP_API_URL;
 function SummaryPage() {
   const [summaryData, setSummaryData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://192.168.100.124:3001/api/summary')
+    fetch(`${API_URL}/summary`)
       .then((res) => res.json())
       .then((data) => {
         const updatedData = data.map((row) => ({
