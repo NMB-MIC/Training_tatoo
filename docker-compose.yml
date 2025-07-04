@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   sql_server:
     image: mcr.microsoft.com/mssql/server:2019-latest
@@ -11,6 +9,11 @@ services:
       - "1433:1433"
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "DmX08775416421", "-Q", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   server:
     build: ./server
@@ -23,7 +26,8 @@ services:
     ports:
       - "3001:3001"
     depends_on:
-      - sql_server
+      sql_server:
+        condition: service_healthy
     networks:
       - app-network
 
@@ -36,7 +40,3 @@ services:
       - server
     networks:
       - app-network
-
-networks:
-  app-network:
-    driver: bridge
