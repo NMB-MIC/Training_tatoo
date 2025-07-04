@@ -11,6 +11,8 @@ import {
   Grid,
 } from '@mui/material';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 function AddProductBalance() {
   const [items, setItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState('');
@@ -24,7 +26,7 @@ function AddProductBalance() {
   const password = localStorage.getItem('password');
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/item-master')
+    fetch(`${API_URL}/api/item-master`)
       .then((res) => res.json())
       .then((data) => {
         setItems(data);
@@ -50,7 +52,7 @@ function AddProductBalance() {
     };
 
     try {
-      const res = await fetch('http://localhost:3001/api/product-balance', {
+      const res = await fetch(`${API_URL}/api/product-balance`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newData),

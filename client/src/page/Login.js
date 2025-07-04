@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { TextField, Button, Typography, Box, Alert } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import { useNavigate } from 'react-router-dom';
+const API_URL = process.env.REACT_APP_API_URL;
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -22,7 +23,7 @@ function Login() {
     e.preventDefault();
 
     try {
-      const res = await fetch('http://localhost:3001/api/login', {
+      const res = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

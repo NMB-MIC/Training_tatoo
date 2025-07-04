@@ -14,6 +14,7 @@ import {
   Snackbar,
 } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
+const API_URL = process.env.REACT_APP_API_URL;
 
 const AlertSnackbar = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -30,7 +31,7 @@ function BorrowList() {
   const password = localStorage.getItem('password');
 
 useEffect(() => {
-  fetch('http://localhost:3001/api/borrow-log')
+  fetch(`${API_URL}/api/borrow-log`)
     .then((res) => res.json())
     .then((data) => {
       const onlyBorrowReturn = data.filter((item) => item.OperationID === 3 || item.OperationID === 4);
@@ -60,7 +61,7 @@ useEffect(() => {
 
 const handleReturn = async (item) => {
     try {
-      const res = await fetch('http://localhost:3001/api/return-log', {
+      const res = await fetch(`${API_URL}/api/return-log`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

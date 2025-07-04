@@ -3,6 +3,7 @@ import { TextField, Button, Typography, Box, Alert, IconButton } from '@mui/mate
 import CheckIcon from '@mui/icons-material/Check';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
+const API_URL = process.env.REACT_APP_API_URL;
 
 function Register() {
   const [username, setUsername] = useState('');
@@ -23,7 +24,7 @@ function Register() {
     }
 
     try {
-      const res = await fetch('http://localhost:3001/api/register', {
+      const res = await fetch(`${API_URL}/api/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({emp_no, username, password }),
