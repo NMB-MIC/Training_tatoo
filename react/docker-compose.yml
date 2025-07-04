@@ -1,0 +1,42 @@
+version: '3.9'
+
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sql_server
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=DmX08775416421
+    ports:
+      - "1433:1433"
+    networks:
+      - app-network
+
+  server:
+    build: ./server
+    container_name: app_server
+    environment:
+      - DB_USER=sa
+      - DB_PASSWORD=DmX08775416421
+      - DB_SERVER=db
+      - DB_DATABASE=stock_t
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  client:
+    build: ./client
+    container_name: app_client
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
