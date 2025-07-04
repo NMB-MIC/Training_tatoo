@@ -1,14 +1,17 @@
-version: '3.9'
-
 services:
   db:
     image: mcr.microsoft.com/mssql/server:2019-latest
     container_name: sql_server
     environment:
-      - ACCEPT_EULA=Y
       - SA_PASSWORD=DmX08775416421
+      - ACCEPT_EULA=Y
     ports:
       - "1433:1433"
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P DmX08775416421 -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 10
     networks:
       - app-network
 
@@ -23,20 +26,7 @@ services:
     ports:
       - "3001:3001"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - app-network
-
-  client:
-    build: ./client
-    container_name: app_client
-    ports:
-      - "80:80"
-    depends_on:
-      - server
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge
