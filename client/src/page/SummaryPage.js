@@ -17,7 +17,7 @@ function SummaryPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/summary')
+    fetch('http://192.168.100.124:3001/api/summary')
       .then((res) => res.json())
       .then((data) => {
         const updatedData = data.map((row) => ({

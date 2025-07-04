@@ -24,7 +24,7 @@ function Register() {
     }
 
     try {
-      const res = await fetch(`${API_URL}/api/register`, {
+      const res = await fetch('http://192.168.100.124:3001/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({emp_no, username, password }),
