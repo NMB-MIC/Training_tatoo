@@ -11,11 +11,6 @@ services:
       - "1433:1433"
     networks:
       - app-network
-    healthcheck:
-      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P DmX08775416421 -Q "SELECT 1" || exit 1
-      interval: 10s
-      timeout: 5s
-      retries: 10
 
   server:
     build: ./server
@@ -28,8 +23,7 @@ services:
     ports:
       - "3001:3001"
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     networks:
       - app-network
 
