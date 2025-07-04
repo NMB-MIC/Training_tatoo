@@ -7,7 +7,7 @@ const path = require('path');
 const fs = require('fs');
 const dbUser = process.env.DB_USER || 'sa';
 const dbPassword = process.env.DB_PASSWORD || 'DmX08775416421';
-const dbServer = process.env.DB_SERVER || '192.168.100.124';
+const dbServer = process.env.DB_SERVER || 'db';
 const dbDatabase = process.env.DB_DATABASE || 'stock_t';
 
 app.use(cors()); 
