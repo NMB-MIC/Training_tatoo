@@ -18,6 +18,7 @@ import {
   Snackbar
 } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
+const API_URL = process.env.REACT_APP_API_URL;
 
 function ItemAvailableList() {
   const [items, setItems] = useState([]);
@@ -34,7 +35,7 @@ function ItemAvailableList() {
   });
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/product-balance2')
+    fetch(`${API_URL}/product-balance2`)
       .then((res) => res.json())
       .then((data) => {
         setItems(data);
@@ -71,7 +72,7 @@ function ItemAvailableList() {
     }
 
     try {
-      const res = await fetch('http://localhost:3001/api/product-balance-type', {
+      const res = await fetch(`${API_URL}/product-balance-type`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -93,7 +94,7 @@ function ItemAvailableList() {
         setMessageType('success');
         setSnackbarOpen(true);
         setSelectedItem(null);
-        fetch('http://localhost:3001/api/product-balance2')
+        fetch(`${API_URL}/product-balance2`)
           .then((res) => res.json())
           .then((data) => setItems(data))
           .catch((error) => console.error('Error fetching items:', error));

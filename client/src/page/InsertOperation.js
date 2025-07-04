@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-
+const API_URL = process.env.REACT_APP_API_URL;
 function InsertOperation() {
   const [operationName, setOperationName] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -22,7 +22,7 @@ function InsertOperation() {
     e.preventDefault();
 
     try {
-      const res = await fetch('http://localhost:3001/api/operation', {
+      const res = await fetch(`${API_URL}/operation`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ OperationName: operationName }),

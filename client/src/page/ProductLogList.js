@@ -13,6 +13,7 @@ import {
   TablePagination,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+const API_URL = process.env.REACT_APP_API_URL;
 
 function ProductLogList() {
   const [logs, setLogs] = useState([]);
@@ -22,7 +23,7 @@ function ProductLogList() {
   const theme = useTheme();
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/product-log')
+    fetch(`${API_URL}/product-log`)
       .then((res) => res.json())
       .then((data) => {
         setLogs(data);

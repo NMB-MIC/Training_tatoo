@@ -26,7 +26,7 @@ function AddProductBalance() {
   const password = localStorage.getItem('password');
 
   useEffect(() => {
-    fetch(`${API_URL}/api/item-master`)
+    fetch(`${API_URL}/item-master`)
       .then((res) => res.json())
       .then((data) => {
         setItems(data);
@@ -52,7 +52,7 @@ function AddProductBalance() {
     };
 
     try {
-      const res = await fetch(`${API_URL}/api/product-balance`, {
+      const res = await fetch(`${API_URL}/product-balance`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newData),

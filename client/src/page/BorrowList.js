@@ -31,7 +31,7 @@ function BorrowList() {
   const password = localStorage.getItem('password');
 
 useEffect(() => {
-  fetch(`${API_URL}/api/borrow-log`)
+  fetch(`${API_URL}/borrow-log`)
     .then((res) => res.json())
     .then((data) => {
       const onlyBorrowReturn = data.filter((item) => item.OperationID === 3 || item.OperationID === 4);
@@ -61,7 +61,7 @@ useEffect(() => {
 
 const handleReturn = async (item) => {
     try {
-      const res = await fetch(`${API_URL}/api/return-log`, {
+      const res = await fetch(`${API_URL}/return-log`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

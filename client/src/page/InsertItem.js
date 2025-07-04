@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+const API_URL = process.env.REACT_APP_API_URL;
 const AlertSnackbar = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
@@ -34,7 +35,7 @@ function InsertItem() {
   const [messageType, setMessageType] = useState('success');
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/category')
+    fetch(`${API_URL}/category`)
       .then(res => res.json())
       .then(data => setCategories(data))
       .catch(err => console.error('Error loading categories:', err));
@@ -63,7 +64,7 @@ function InsertItem() {
     formData.append('pic', picFile);
   
     try {
-      const res = await fetch('http://localhost:3001/api/item-master', {
+      const res = await fetch(`${API_URL}/item-master`, {
         method: 'POST',
         body: formData,
       });

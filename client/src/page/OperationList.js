@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
-
+const API_URL = process.env.REACT_APP_API_URL;
 function OperationList() {
   const navigate = useNavigate();
   const [operations, setOperations] = useState([]);
@@ -22,7 +22,7 @@ function OperationList() {
   const theme = useTheme();
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/operation')
+    fetch(`${API_URL}/operation`)
       .then((res) => res.json())
       .then((data) => {
         setOperations(data);

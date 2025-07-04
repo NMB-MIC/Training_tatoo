@@ -20,7 +20,7 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import MuiAlert from '@mui/material/Alert';
-
+const API_URL = process.env.REACT_APP_API_URL;
 function ProductBalanceList() {
   const [balances, setBalances] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -40,7 +40,7 @@ function ProductBalanceList() {
   }, []);
 
   const fetchData = () => {
-    fetch('http://localhost:3001/api/product-balance')
+    fetch(`${API_URL}/product-balance`)
       .then((res) => res.json())
       .then((data) => {
         setBalances(data);
@@ -73,7 +73,7 @@ function ProductBalanceList() {
     let reqty = qtyChangeValue; // เพราะเป็น Stock In
 
     try {
-      const res = await fetch(`http://localhost:3001/api/product-balance-type`, {
+      const res = await fetch(`${API_URL}/product-balance-type`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

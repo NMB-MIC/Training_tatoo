@@ -36,162 +36,162 @@ const config = {
 };
 
 
-// async function ensureDatabaseAndTables() {
-//   try {
-//     await sql.connect(masterConfig);
+async function ensureDatabaseAndTables() {
+  try {
+    await sql.connect(masterConfig);
 
-//     const dbResult = await sql.query`SELECT name FROM sys.databases WHERE name = 'stock_t'`;
-//     if (dbResult.recordset.length === 0) {
-//       console.log('check db');
-//       await sql.query(`CREATE DATABASE stock_t`);
-//       console.log('create db');
-//     } else {
-//       console.log('ready');
-//     }
+    const dbResult = await sql.query`SELECT name FROM sys.databases WHERE name = 'stock_t'`;
+    if (dbResult.recordset.length === 0) {
+      console.log('check db');
+      await sql.query(`CREATE DATABASE stock_t GO`);
+      console.log('create db');
+    } else {
+      console.log('ready');
+    }
 
-//     await sql.close();
+    await sql.close();
 
-//     await sql.connect(config);
+    await sql.connect(config);
 
-//     await sql.query(`
-//       IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='user' AND xtype='U')
-//       CREATE TABLE [user] (
-//         EmpID INT IDENTITY(1,1) PRIMARY KEY,
-//         EMP_no VARCHAR(20) NOT NULL,
-//         UserName VARCHAR(50) NOT NULL,
-//         Password VARCHAR(50) NOT NULL,
-//         registered_at DATETIME DEFAULT GETDATE(),
-//         updated_at DATETIME DEFAULT GETDATE()
-//       )
-//     `);
+    await sql.query(`
+      IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='user' AND xtype='U')
+      CREATE TABLE stock_t.dbo.[user] (
+        EmpID INT IDENTITY(1,1) PRIMARY KEY,
+        EMP_no VARCHAR(20) NOT NULL,
+        UserName VARCHAR(50) NOT NULL,
+        Password VARCHAR(50) NOT NULL,
+        registered_at DATETIME DEFAULT GETDATE(),
+        updated_at DATETIME DEFAULT GETDATE()
+      )
+    `);
 
-//     await sql.query(`
-//       IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Category' AND xtype='U')
-//       CREATE TABLE Category (
-//         CategoryID INT IDENTITY(1,1) PRIMARY KEY,
-//         CategoryName VARCHAR(100),
-//         registered_at DATETIME DEFAULT GETDATE(),
-//         updated_at DATETIME DEFAULT GETDATE()
-//       )
-//     `);
+    await sql.query(`
+      IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Category' AND xtype='U')
+      CREATE TABLE stock_t.dbo.Category (
+        CategoryID INT IDENTITY(1,1) PRIMARY KEY,
+        CategoryName VARCHAR(100),
+        registered_at DATETIME DEFAULT GETDATE(),
+        updated_at DATETIME DEFAULT GETDATE()
+      )
+    `);
 
-//     await sql.query(`
-//       IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='itemMaster' AND xtype='U')
-//       CREATE TABLE itemMaster (
-//         ItemID INT IDENTITY(1,1) PRIMARY KEY,
-//         ItemName VARCHAR(255),
-//         SerialNo VARCHAR(100),
-//         MacNo VARCHAR(100),
-//         MinStock INT,
-//         CategoryID INT,
-//         registered_at DATETIME DEFAULT GETDATE(),
-//         updated_at DATETIME DEFAULT GETDATE(),
-//         pic VARCHAR(255)
-//       )
-//     `);
+    await sql.query(`
+      IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='itemMaster' AND xtype='U')
+      CREATE TABLE stock_t.dbo.itemMaster (
+        ItemID INT IDENTITY(1,1) PRIMARY KEY,
+        ItemName VARCHAR(255),
+        SerialNo VARCHAR(100),
+        MacNo VARCHAR(100),
+        MinStock INT,
+        CategoryID INT,
+        registered_at DATETIME DEFAULT GETDATE(),
+        updated_at DATETIME DEFAULT GETDATE(),
+        pic VARCHAR(255)
+      )
+    `);
 
-//     await sql.query(`
-//       IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='OperationType' AND xtype='U')
-//       CREATE TABLE OperationType (
-//         OperationID INT IDENTITY(1,1) PRIMARY KEY,
-//         OperationName VARCHAR(100),
-//         registered_at DATETIME DEFAULT GETDATE(),
-//         updated_at DATETIME DEFAULT GETDATE()
-//       )
-//     `);
+    await sql.query(`
+      IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='OperationType' AND xtype='U')
+      CREATE TABLE stock_t.dbo.OperationType (
+        OperationID INT IDENTITY(1,1) PRIMARY KEY,
+        OperationName VARCHAR(100),
+        registered_at DATETIME DEFAULT GETDATE(),
+        updated_at DATETIME DEFAULT GETDATE()
+      )
+    `);
 
-//     await sql.query(`
-//       IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ProductBalance' AND xtype='U')
-//       CREATE TABLE ProductBalance (
-//         ProductBalanceID INT IDENTITY(1,1) PRIMARY KEY,
-//         ItemID INT,
-//         EmpID INT,
-//         Quantity INT,
-//         PO_No VARCHAR(50),
-//         Do_No VARCHAR(50),
-//         OrderDate DATE,
-//         ReceiveDate DATE,
-//         ReceiveQty INT,
-//         diffQuantity INT,
-//         registered_at DATETIME DEFAULT GETDATE(),
-//         updated_at DATETIME DEFAULT GETDATE()
-//       )
-//     `);
+    await sql.query(`
+      IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ProductBalance' AND xtype='U')
+      CREATE TABLE stock_t.dbo.ProductBalance (
+        ProductBalanceID INT IDENTITY(1,1) PRIMARY KEY,
+        ItemID INT,
+        EmpID INT,
+        Quantity INT,
+        PO_No VARCHAR(50),
+        Do_No VARCHAR(50),
+        OrderDate DATE,
+        ReceiveDate DATE,
+        ReceiveQty INT,
+        diffQuantity INT,
+        registered_at DATETIME DEFAULT GETDATE(),
+        updated_at DATETIME DEFAULT GETDATE()
+      )
+    `);
 
-//     await sql.query(`
-//       IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ProductLog' AND xtype='U')
-//       CREATE TABLE ProductLog (
-//         ProductLogID INT IDENTITY(1,1) PRIMARY KEY,
-//         ItemID INT,
-//         ItemName VARCHAR(255),
-//         SerialNo VARCHAR(100),
-//         MacNo VARCHAR(100),
-//         PO_No VARCHAR(50),
-//         Do_No VARCHAR(50),
-//         Quantity INT,
-//         OperationID INT,
-//         EmpID INT,
-//         Issued_date DATE,
-//         Plan_return DATE,
-//         registered_at DATETIME DEFAULT GETDATE(),
-//         updated_at DATETIME DEFAULT GETDATE()
-//       )
-//     `);
+    await sql.query(`
+      IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ProductLog' AND xtype='U')
+      CREATE TABLE stock_t.dbo.ProductLog (
+        ProductLogID INT IDENTITY(1,1) PRIMARY KEY,
+        ItemID INT,
+        ItemName VARCHAR(255),
+        SerialNo VARCHAR(100),
+        MacNo VARCHAR(100),
+        PO_No VARCHAR(50),
+        Do_No VARCHAR(50),
+        Quantity INT,
+        OperationID INT,
+        EmpID INT,
+        Issued_date DATE,
+        Plan_return DATE,
+        registered_at DATETIME DEFAULT GETDATE(),
+        updated_at DATETIME DEFAULT GETDATE()
+      )
+    `);
 
-//     // ✅ Insert default categories ถ้ายังไม่มีข้อมูล
-//     await sql.query(`
-//       IF NOT EXISTS (SELECT 1 FROM Category)
-//       BEGIN
-//         INSERT INTO Category (CategoryName, registered_at, updated_at)
-//         VALUES 
-//         ('IOT Board', GETDATE(), GETDATE()),
-//         ('Server', GETDATE(), GETDATE()),
-//         ('PCB Comp.', GETDATE(), GETDATE()),
-//         ('Network', GETDATE(), GETDATE()),
-//         ('Other', GETDATE(), GETDATE())
-//       END
-//     `);
+    // ✅ Insert default categories ถ้ายังไม่มีข้อมูล
+    await sql.query(`
+      IF NOT EXISTS (SELECT 1 FROM Category)
+      BEGIN
+        INSERT INTO Category (CategoryName, registered_at, updated_at)
+        VALUES 
+        ('IOT Board', GETDATE(), GETDATE()),
+        ('Server', GETDATE(), GETDATE()),
+        ('PCB Comp.', GETDATE(), GETDATE()),
+        ('Network', GETDATE(), GETDATE()),
+        ('Other', GETDATE(), GETDATE())
+      END
+    `);
 
-//     // ✅ Insert default operations ถ้ายังไม่มีข้อมูล
-//     await sql.query(`
-//       IF NOT EXISTS (SELECT 1 FROM OperationType)
-//       BEGIN
-//         INSERT INTO OperationType (OperationName, registered_at, updated_at)
-//         VALUES 
-//         ('Stock in', GETDATE(), GETDATE()),
-//         ('Stock out', GETDATE(), GETDATE()),
-//         ('Borrow', GETDATE(), GETDATE()),
-//         ('Return', GETDATE(), GETDATE())
-//       END
-//     `);
-//       await sql.query(`
-//         IF NOT EXISTS (SELECT 1 FROM [user])
-//         BEGIN
-//           INSERT INTO [user] (EMP_no, UserName, Password, registered_at, updated_at)
-//           VALUES 
-//           ('LE474', 'a', 'a', GETDATE(), GETDATE())
-//         END
-//       `);
+    // ✅ Insert default operations ถ้ายังไม่มีข้อมูล
+    await sql.query(`
+      IF NOT EXISTS (SELECT 1 FROM OperationType)
+      BEGIN
+        INSERT INTO OperationType (OperationName, registered_at, updated_at)
+        VALUES 
+        ('Stock in', GETDATE(), GETDATE()),
+        ('Stock out', GETDATE(), GETDATE()),
+        ('Borrow', GETDATE(), GETDATE()),
+        ('Return', GETDATE(), GETDATE())
+      END
+    `);
+      await sql.query(`
+        IF NOT EXISTS (SELECT 1 FROM [user])
+        BEGIN
+          INSERT INTO [user] (EMP_no, UserName, Password, registered_at, updated_at)
+          VALUES 
+          ('LE474', 'a', 'a', GETDATE(), GETDATE())
+        END
+      `);
 
-//     console.log('✅ ตรวจสอบ และสร้างตารางครบแล้ว');
-//   } catch (err) {
-//     console.error('❌ Error creating database/tables:', err);
-//     throw err;
-//   } finally {
-//     await sql.close();
-//   }
-// }
+    console.log('✅ ตรวจสอบ และสร้างตารางครบแล้ว');
+  } catch (err) {
+    console.error('❌ Error creating database/tables:', err);
+    throw err;
+  } finally {
+    await sql.close();
+  }
+}
 
-// (async () => {
-//   try {
-//     await ensureDatabaseAndTables();
-//     app.listen(3001, () => {
-//       console.log('Backend running on port 3001');
-//     });
-//   } catch (err) {
-//     console.error('❌ Server start failed:', err);
-//   }
-// })();
+(async () => {
+  try {
+    await ensureDatabaseAndTables();
+    app.listen(3001, () => {
+      console.log('Backend running on port 3001');
+    });
+  } catch (err) {
+    console.error('❌ Server start failed:', err);
+  }
+})();
 
 
 app.post('/api/login', async (req, res) => {
@@ -203,7 +203,7 @@ app.post('/api/login', async (req, res) => {
     const result = await sql.query`
       SELECT * FROM [user] 
       WHERE UserName = ${username} AND Password = ${password}
-    `;
+    // `;
 
     if (result.recordset.length > 0) {
       res.json({ success: true, username: result.recordset[0].UserName,  password: result.recordset[0].Password });

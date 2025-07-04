@@ -14,6 +14,8 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
+const API_URL = process.env.REACT_APP_API_URL;
+
 function CategoryList() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
@@ -21,7 +23,7 @@ function CategoryList() {
   const theme = useTheme();
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/category')
+    fetch(`${API_URL}/category`)
       .then((res) => res.json())
       .then((data) => {
         setCategories(data);

@@ -23,7 +23,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { useTheme } from '@mui/material/styles';
-
+const API_URL = process.env.REACT_APP_API_URL;
 function ItemMasterList() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -43,7 +43,7 @@ function ItemMasterList() {
   });
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/item-master')
+    fetch(`${API_URL}/item-master`)
       .then((res) => res.json())
       .then((data) => {
         setItems(data);
@@ -71,7 +71,7 @@ function ItemMasterList() {
 
   const handleUpdateSubmit = async () => {
     try {
-      const res = await fetch(`http://localhost:3001/api/item-master/${editItemId}`, {
+      const res = await fetch(`${API_URL}/item-master/${editItemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ MacNo: macNo, MinStock: minStock }),
@@ -101,7 +101,7 @@ function ItemMasterList() {
 
   const handleConfirmDelete = async () => {
     try {
-      const res = await fetch(`http://localhost:3001/api/item-master/${deleteId}`, {
+      const res = await fetch(`${API_URL}/item-master/${deleteId}`, {
         method: 'DELETE',
       });
       if (res.ok) {
