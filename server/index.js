@@ -29,17 +29,17 @@ async function ensureTables() {
   try {
     await sql.connect(config);
 
-    await sql.query(`
-      IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='user' AND xtype='U')
-      CREATE TABLE [user] (
-        EmpID INT IDENTITY(1,1) PRIMARY KEY,
-        EMP_no VARCHAR(20) NOT NULL,
-        UserName VARCHAR(50) NOT NULL,
-        Password VARCHAR(50) NOT NULL,
-        registered_at DATETIME DEFAULT GETDATE(),
-        updated_at DATETIME DEFAULT GETDATE()
-      )
-    `);
+    // await sql.query(`
+    //   IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='user' AND xtype='U')
+    //   CREATE TABLE [user] (
+    //     EmpID INT IDENTITY(1,1) PRIMARY KEY,
+    //     EMP_no VARCHAR(20) NOT NULL,
+    //     UserName VARCHAR(50) NOT NULL,
+    //     Password VARCHAR(50) NOT NULL,
+    //     registered_at DATETIME DEFAULT GETDATE(),
+    //     updated_at DATETIME DEFAULT GETDATE()
+    //   )
+    // `);
 
     // await sql.query(`
     //   IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Category' AND xtype='U')
