@@ -5,8 +5,8 @@ services:
     image: mcr.microsoft.com/azure-sql-edge
     container_name: sql_server
     environment:
-      - SA_PASSWORD=DmX08775416421
-      - ACCEPT_EULA=Y
+      SA_PASSWORD: DmX08775416421
+      ACCEPT_EULA: "Y"
     ports:
       - "1433:1433"
     networks:
@@ -18,13 +18,14 @@ services:
       retries: 10
 
   backend:
-    build: ./backend
+    build:
+      context: ./backend
     container_name: app_server
     environment:
-      - DB_USER=sa
-      - DB_PASSWORD=DmX08775416421
-      - DB_SERVER=sql_server
-      - DB_DATABASE=autoplan
+      DB_USER: sa
+      DB_PASSWORD: DmX08775416421
+      DB_SERVER: sql_server
+      DB_DATABASE: autoplan
     ports:
       - "8000:8000"
     depends_on:
@@ -32,8 +33,10 @@ services:
         condition: service_healthy
     networks:
       - app-network
+
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
     container_name: app_client
     ports:
       - "3001:3001"
