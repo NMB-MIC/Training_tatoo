@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 
 DB_USER = "sa"
 DB_PASSWORD = "DmX08775416421"
-DB_SERVER = "localhost"
+DB_SERVER = "db"
 DB_NAME = "autoplan"
 DB_DRIVER = "ODBC+Driver+17+for+SQL+Server"
 
