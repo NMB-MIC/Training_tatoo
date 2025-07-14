@@ -39,7 +39,7 @@ services:
       context: ./frontend
     container_name: app_client
     ports:
-      - "3001:3001"
+      - "3001:80"
     depends_on:
       - backend
     networks:
