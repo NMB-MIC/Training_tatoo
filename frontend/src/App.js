@@ -9,12 +9,13 @@ import RequireTurningPage from './page/RequireTurningPage';
 
 function App() {
   const location = useLocation();
-  const hideNavbarPaths = ['/', '/login','/register'];
+  const hideNavbarPaths = ['/login','/register'];
 
   return (
     <>
       {!hideNavbarPaths.includes(location.pathname) && <Navbar />}
       <Routes>
+        <Route path="/" element={<UploadExcel />} />
         <Route path="/UploadExcel" element={<UploadExcel />} />
         <Route path="/CheckParentPartPage" element={<CheckParentPartPage />} />
         <Route path="/RequireTurningPage" element={<RequireTurningPage />} />      

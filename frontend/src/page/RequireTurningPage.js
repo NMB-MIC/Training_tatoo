@@ -6,8 +6,16 @@ import {
   Paper,
   LinearProgress,
   Alert,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from "@mui/material";
 import SyncIcon from "@mui/icons-material/Sync";
+import DownloadIcon from "@mui/icons-material/Download";
+import Papa from "papaparse";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -39,60 +47,89 @@ export default function RequireTurningPage() {
     }
   };
 
+  const handleExportCSV = () => {
+    const csv = Papa.unparse(data);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "require_turning.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <Box sx={{ display: "flex", justifyContent: "center", mt: 5 }}>
-      <Paper elevation={4} sx={{ p: 4, width: "650px" }}>
+      <Paper elevation={4} sx={{ p: 4, width: "100%", maxWidth: "1200px" }}>
         <Typography variant="h5" gutterBottom align="center">
           รายการ Require Turning
         </Typography>
 
-        <Button
-          variant="contained"
-          startIcon={<SyncIcon />}
-          onClick={handleFetchData}
-          disabled={loading}
-          sx={{ mb: 2 }}
-          fullWidth
-        >
-          {loading ? "กำลังโหลด..." : "โหลดข้อมูล"}
-        </Button>
+        <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+          <Button
+            variant="contained"
+            startIcon={<SyncIcon />}
+            onClick={handleFetchData}
+            disabled={loading}
+            fullWidth
+          >
+            {loading ? "กำลังโหลด..." : "โหลดข้อมูล"}
+          </Button>
+
+          <Button
+            variant="outlined"
+            startIcon={<DownloadIcon />}
+            onClick={handleExportCSV}
+            disabled={data.length === 0}
+            fullWidth
+          >
+            ดาวน์โหลด CSV
+          </Button>
+        </Box>
 
         {loading && <LinearProgress sx={{ mb: 2 }} />}
 
         {data.length > 0 ? (
-          <Box
+          <TableContainer
             sx={{
-              maxHeight: 400,
-              overflowY: "auto",
-              background: "#f5f5f5",
-              p: 2,
-              borderRadius: "4px",
+              maxHeight: 500,
+              overflowX: "auto",
             }}
           >
-            {data.map((item, index) => (
-              <Box
-                key={index}
-                sx={{
-                  mb: 2,
-                  p: 1.5,
-                  background: "#ffffff",
-                  borderRadius: "4px",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                }}
-              >
-                <Typography sx={{ fontWeight: "bold" }}>
-                  Parent Part No: {item.parent_part_no}
-                </Typography>
-                <Typography>Part No: {item.part_no_value}</Typography>
-                <Typography>Balance Order: {item.balance_order}</Typography>
-                <Typography>WIP Qty: {item.wip_qty ?? "-"}</Typography>
-                <Typography>
-                  Target Daily Issue: {item.target_daily_issue ?? "-"}
-                </Typography>
-                <Typography>Source: {item.source}</Typography>
-              </Box>
-            ))}
-          </Box>
+            <Table stickyHeader sx={{ minWidth: 2000 }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>order_no</TableCell>
+                  <TableCell>due_date</TableCell>
+                  <TableCell>part_group</TableCell>
+                  <TableCell>part_no_value</TableCell>
+                  <TableCell>part_component_group</TableCell>
+                  <TableCell>parent_part_no</TableCell>
+                  <TableCell>require_turning</TableCell>
+                  <TableCell>priority_group</TableCell>
+                  <TableCell>wip_parent</TableCell>
+                  <TableCell>Target Daily Issue</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data.map((item, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{item.order_no}</TableCell>
+                    <TableCell>{item.due_date}</TableCell>
+                    <TableCell>{item.part_group}</TableCell>
+                    <TableCell>{item.part_no_value}</TableCell>
+                    <TableCell>{item.part_component_group}</TableCell>
+                    <TableCell>{item.parent_part_no}</TableCell>
+                    <TableCell>{item.require_turning ?? "-"}</TableCell>
+                    <TableCell>{item.priority_group}</TableCell>
+                    <TableCell>{item.wip_qty ?? "-"}</TableCell>
+                    <TableCell>{item.target_daily_issue ?? "-"}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         ) : (
           !loading && (
             <Alert severity="info">ไม่มีข้อมูล กรุณากดปุ่มโหลดข้อมูล</Alert>

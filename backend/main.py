@@ -17,7 +17,7 @@ Base.metadata.create_all(bind=engine)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://192.168.100.124:3001"],
+    allow_origins=["http://192.168.100.124:3001","http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -1662,7 +1662,7 @@ def generate_require_turning(db: Session = Depends(get_db)):
                 existing.wip_parent = wip_qty
                 existing.target_daily_issue = target_daily
                 existing.order_no_id = order_no_id
-                existing.order_no_source = source
+                existing.order_no_source = parent.part_component_group
                 existing.parent_part_no_id = parent.id
             else:
                 # เพิ่มใหม่
@@ -1675,7 +1675,7 @@ def generate_require_turning(db: Session = Depends(get_db)):
                     wip_parent=wip_qty,
                     target_daily_issue=target_daily,
                     order_no_id=order_no_id,
-                    order_no_source=source,
+                    order_no_source=parent.part_component_group,
                     part_no_id=part.id,
                     parent_part_no_id=parent.id,
                 )
@@ -1683,16 +1683,16 @@ def generate_require_turning(db: Session = Depends(get_db)):
 
             # เก็บผลลัพธ์ส่งกลับ frontend
             results.append({
-                "parent_part_no": parent.parent_part_no,
-                "part_no_value": part.part_no_value,
                 "order_no": order_no,
                 "due_date": due_date,
-                "balance_order": balance_order_value,
                 "part_group": part_group,
-                "source": source,
+                "part_no_value": part.part_no_value,
+                "part_component_group": parent.part_component_group,
+                "parent_part_no": parent.parent_part_no,
+                "require_turning": balance_order_value,
+                "priority_group": priority_group,
                 "wip_qty": wip_qty,
-                "target_daily_issue": target_daily,
-                "priority_group": priority_group
+                "target_daily_issue": target_daily
             })
 
     db.commit()
