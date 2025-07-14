@@ -450,14 +450,14 @@ async def upload_machine(file: UploadFile = File(...), db: Session = Depends(get
                     can_use=can_use_value,
                     machine_type_id=machine_type.id
                 )
-                # print(f"✅")
+                print(f"✅2")
                 db.add(new_machine)
                 db.flush()  # ⭐ ได้ new_machine.id
                 count_added += 1
 
                 # 🔥 เพิ่มใน NoRunMachine
                 all_parents = db.query(ParentPartNo).all()
-                # print(f"✅1")
+                print(f"✅1")
                 for parent in all_parents:
                     exists = db.query(NoRunMachine).filter(
                         NoRunMachine.parent_part_no_id == parent.id,
@@ -469,7 +469,7 @@ async def upload_machine(file: UploadFile = File(...), db: Session = Depends(get
                             parent_part_no_id=parent.id,
                             machine_id=new_machine.id
                         )
-                        # print(f"✅")
+                        print(f"✅3")
                         db.add(new_no_run)
                         count_no_run_added += 1
 
