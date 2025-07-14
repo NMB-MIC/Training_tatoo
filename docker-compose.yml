@@ -1,48 +1,24 @@
-version: '3.9'
+version: "3.9"
 
 services:
-  sql_server:
-    image: mcr.microsoft.com/azure-sql-edge
-    container_name: sql_server
-    environment:
-      - SA_PASSWORD=DmX08775416421
-      - ACCEPT_EULA=Y
+  backend:
+    build:
+      context: ./backend        # ✅ ชี้ไปที่โฟลเดอร์ backend
+      dockerfile: Dockerfile    # ใช้ชื่อ Dockerfile (หรือระบุชื่อถ้าเปลี่ยน)
+    container_name: fastapi_backend
     ports:
-      - "1433:1433"
-    networks:
-      - app-network
-    healthcheck:
-      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "DmX08775416421", "-Q", "SELECT 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
+      - "8000:8000"
+    volumes:
+      - ./backend:/app          # mount code ในกรณีพัฒนา (ถ้าไม่ต้องการ hot-reload ตัดออก)
+    restart: always
 
-  server:
-    build: ./server
-    container_name: app_server
-    environment:
-      - DB_USER=sa
-      - DB_PASSWORD=DmX08775416421
-      - DB_SERVER=sql_server
-      - DB_DATABASE=stock_t
+  frontend:
+    build:
+      context: ./frontend       # ✅ ชี้ไปที่โฟลเดอร์ frontend
+      dockerfile: Dockerfile
+    container_name: node_frontend
     ports:
       - "3001:3001"
-    depends_on:
-      sql_server:
-        condition: service_healthy
-    networks:
-      - app-network
-
-  client:
-    build: ./client
-    container_name: app_client
-    ports:
-      - "80:80"
-    depends_on:
-      - server
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge
+    volumes:
+      - ./frontend:/app         # mount code ในกรณีพัฒนา (ถ้าไม่ต้องการ hot-reload ตัดออก)
+    restart: always
