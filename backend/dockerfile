@@ -1,17 +1,17 @@
 FROM python:3.11-slim
 
-# ติดตั้ง dependencies สำหรับ ODBC
+# ติดตั้ง dependencies พื้นฐาน
 RUN apt-get update && \
-    apt-get install -y gcc g++ unixodbc unixodbc-dev && \
+    apt-get install -y curl gnupg2 gcc g++ unixodbc unixodbc-dev && \
     rm -rf /var/lib/apt/lists/*
 
-# ถ้าใช้ SQL Server และต้องการ Microsoft ODBC driver ด้วย ให้เพิ่ม (เลือกทำ ถ้าใช้ MSSQL เท่านั้น)
-# RUN apt-get update && \
-#     apt-get install -y curl gnupg2 && \
-#     curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
-#     curl https://packages.microsoft.com/config/debian/11/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
-#     apt-get update && \
-#     ACCEPT_EULA=Y apt-get install -y msodbcsql18
+# เพิ่ม Microsoft package key และ repository
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
+    curl https://packages.microsoft.com/config/debian/11/prod.list > /etc/apt/sources.list.d/mssql-release.list
+
+# อัพเดตและติดตั้ง Microsoft ODBC Driver 17
+RUN apt-get update && \
+    ACCEPT_EULA=Y apt-get install -y msodbcsql17
 
 WORKDIR /app
 
