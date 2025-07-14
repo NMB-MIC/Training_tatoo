@@ -5,7 +5,7 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Install sql server driver
-RUN apt-get update && apt-get install -y gnupg2 curl tzdata
+RUN apt-get install -y curl gnupg2 gcc g++ unixodbc-dev libodbc1
 RUN apt-get install -y cron \
     build-essential \
     curl \
@@ -21,6 +21,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # ✅ คัดลอก source code ทั้งหมด
 COPY . .
 
-RUN chmod +x /app/entrypoint.sh
-ENTRYPOINT ["/app/entrypoint.sh"]
-# CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# RUN chmod +x /app/entrypoint.sh
+# ENTRYPOINT ["/app/entrypoint.sh"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
