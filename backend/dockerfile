@@ -1,33 +1,30 @@
+# ✅ ใช้ image base
 FROM python:3.11-slim
 
-# ติดตั้ง dependencies พื้นฐาน
-RUN apt-get update && \
-    apt-get install -y curl gnupg2 gcc g++ && \
-    rm -rf /var/lib/apt/lists/*
-
-# เพิ่ม Microsoft package key และ repo
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
-    curl https://packages.microsoft.com/config/debian/11/prod.list > /etc/apt/sources.list.d/mssql-release.list
-
-# ติดตั้ง unixODBC ที่จำเป็น (ไม่เอา libodbc2 ที่ conflict)
-RUN apt-get update && \
-    apt-get install -y unixodbc unixodbc-dev
-
-# ลบ package เก่าที่ conflict
-RUN apt-get remove -y libodbc2 libodbcinst2 unixodbc-common
-
-# ติดตั้ง msodbcsql17 พร้อม options
-RUN apt-get update && \
-    ACCEPT_EULA=Y apt-get install -y --allow-downgrades --allow-remove-essential --allow-change-held-packages msodbcsql17
-
+# ✅ ตั้ง working directory
 WORKDIR /app
 
+# ✅ ติดตั้ง dependency ที่จำเป็นสำหรับ pyodbc และ SQL Server driver
+RUN apt-get update && \
+    apt-get install -y gcc g++ gnupg2 curl unixodbc-dev && \
+    curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
+    curl https://packages.microsoft.com/config/debian/12/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
+    apt-get update && \
+    ACCEPT_EULA=Y apt-get install -y msodbcsql18 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# ✅ คัดลอก requirements.txt เข้ามาก่อน
 COPY requirements.txt .
 
+# ✅ ติดตั้ง Python dependency
 RUN pip install --no-cache-dir -r requirements.txt
 
+# ✅ คัดลอก source code ทั้งหมด
 COPY . .
 
+# ✅ เปิด port
 EXPOSE 8000
 
+# ✅ รัน uvicorn (สำหรับ FastAPI หรือ app ที่ใช้ ASGI)
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
