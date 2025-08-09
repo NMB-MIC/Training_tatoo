@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import AssignmentIcon from '@mui/icons-material/Assignment';
-
+import DashboardIcon from '@mui/icons-material/Dashboard'; // เพิ่ม icon Dashboard
 
 function Navbar() {
   const [value, setValue] = useState(0);
@@ -21,11 +21,17 @@ function Navbar() {
         navigate('/UploadExcel');
         break;
       case 1:
-        navigate('/CheckParentPartPage');
+        navigate('/PlanResult');
         break;
       case 2:
-        navigate('/RequireTurningPage');
+        navigate('/PreviewPlanPage');
         break;
+      case 3:
+        navigate('/Dashboard');
+        break;
+      case 4:
+        navigate('/Report');
+        break;      
       default:
         break;
     }
@@ -48,6 +54,8 @@ function Navbar() {
         <BottomNavigationAction label="หน้าแรก" icon={<HomeIcon />} />
         <BottomNavigationAction label="คงเหลือสินค้า" icon={<AssignmentIcon />} />
         <BottomNavigationAction label="123" icon={<AssignmentIcon />} />
+        <BottomNavigationAction label="Dashboard" icon={<DashboardIcon />} />
+        <BottomNavigationAction label="Dashboard" icon={<DashboardIcon />} /> 
       </BottomNavigation>
     </Paper>
   );
