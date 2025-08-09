@@ -1,0 +1,26 @@
+@startsalt
+{
+    title REPORT PAGE
+ACTUAL ASSY
+ {T#
++ ACTUAL|TEMPLATE |TEMPLATE VERSION| FILE
++ ASSY|[dowload]|v.0.0.1|[file]
+}
+[upload]
+
+ {/ ACTUAL|<b>COMBINE}
+
+MONTH | ^select^2025-10^
+Cimbine Result
+{T#
++ Machine No | brg_no_value| group_brg_no_value  | Start Date | End Date | Require_assy |Actual_output |01|02|03|04|05|06|07|08|09|10|..|31
++ AGL02| 686N7SD42| 686N7SD42| 1-Set| 8-Set |10k|10k
++ AGL02| 686N7SD42| 686N7SD42| 9-Set| 11-Set|10k|10k
++ AGL02| 686N7SD42| 686N7SD42| 12-Set| 17-Set|10k|10k
+}
+
+[download]
+
+release v0.0.1
+}
+@endsalt

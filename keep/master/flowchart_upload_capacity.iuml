@@ -1,0 +1,142 @@
+@startuml
+title Flowchart Upload Capacity - release v0.0.2
+
+start
+:Input file;
+
+if (Filename starts with 'toolLimitAndCapa'?) then (yes)
+  if (Filetype is .csv or .xlsx?) then (yes)
+    :Read file into DataFrame (CSV/XLSX);
+    :Drop columns matched '^Unnamed';
+
+    ' -------- Header check (loop) --------
+    :required =
+[brgNoValue, groupBrgNoValue, machineGroup, machineType, machineNo,
+ groupBrgAndMcGroup, limitByType, limitByGroup, joinToolingPartNo,
+ capaDay, utilizeMc, cycleTime, capaF3];
+    while (More required headers?) is (yes)
+      :col = next required;
+      if (col exists in DataFrame headers?) then (yes)
+      else
+        :Alert: Missing required column '{col}';
+        stop
+      endif
+    endwhile (no)
+    ' ------------------------------------
+
+    ' -------- Empty check (loop) --------
+    :rowIndex = 1;
+    while (More rows to check empty?) is (yes)
+      :row = next;
+      if (Any required field empty in row?) then (yes)
+        :Alert: Empty cell at row {rowIndex};
+        stop
+      else
+        :rowIndex = rowIndex + 1;
+      endif
+    endwhile (no)
+    ' ------------------------------------
+
+    ' -------- Number check (loop) --------
+    :rowIndex = 1;
+    while (More rows to check numbers?) is (yes)
+      :row = next;
+      if ([capaDay, cycleTime, utilizeMc] are numeric?) then (yes)
+        :rowIndex = rowIndex + 1;
+      else
+        :Alert: Invalid number at row {rowIndex};
+        stop
+      endif
+    endwhile (no)
+    ' ------------------------------------
+
+    ' -------- Unknown check (loop) --------
+    :rowIndex = 1;
+    while (More rows to check unknown?) is (yes)
+      :row = next;
+      if ("unknown" (case-insensitive) in any field?) then (yes)
+        :Alert: Found 'unknown' at row {rowIndex};
+        stop
+      else
+        :rowIndex = rowIndex + 1;
+      endif
+    endwhile (no)
+    ' -------------------------------------
+
+    :inserted=0;
+    :failed_rows=[], failed_rows_brg=[], failed_rows_machine=[];
+
+    while (More rows to insert?) is (yes)
+      :row = next;
+
+      ' ------------ FK lookups (collect & skip) ------------
+      if (Find BomWos by brgNoValue) then (found)
+        if (Find MachineLayout by machineNo) then (found)
+          if (Find MachineType by machineType) then (found)
+            if (Find Machine by (machineGroup, MachineType.id, MachineLayout.id)) then (found)
+
+              ' ---- Split joinToolingPartNo to list ----
+              :parts = split(row.joinToolingPartNo, ',');\ntrim whitespace; drop empties; deduplicate;
+              if (parts size > 0?) then (yes)
+                ' ---- Upsert LimitAssy per part ----
+                while (More parts?) is (yes)
+                  :partNo = next part;
+                  if (Find LimitAssy by (limitByType, limitByGroup, partNo)) then (found)
+                  else
+                    :Insert LimitAssy(limitByType, limitByGroup, partNo);\ncommit; refresh;
+                  endif
+                endwhile (no)
+
+                ' ---- Insert Capacity (once per row) ----
+                :Insert Capacity(bomWosId, machineId, groupBrgAndMcGroup,\n                     capaDay, utilizeMc, cycleTime, capaF3);\ncommit; refresh; inserted++;
+
+                ' ---- JoinLimitAssy per part ----
+                while (More parts?) is (yes)
+                  :partNo = next part;
+                  :Find LimitAssy by (limitByType, limitByGroup, partNo);
+                  if (Find JoinLimitAssy by (capacityId, limitAssyId)) then (found)
+                  else
+                    :Insert JoinLimitAssy(capacityId, limitAssyId);\ncommit;
+                  endif
+                endwhile (no)
+
+              else
+                :failed_rows += {rowIndex, "joinToolingPartNo empty after split"};
+                ' skip row
+              endif
+
+            else
+              :failed_rows += {rowIndex, "Machine not found from combination"};
+              :failed_rows_machine += {(machineGroup, machineType, machineNo)};
+              ' skip row
+            endif
+          else
+            :failed_rows += {rowIndex, "machineType not found"};
+            ' skip row
+          endif
+        else
+          :failed_rows += {rowIndex, "machineNo not found in MachineLayout"};
+          ' skip row
+        endif
+      else
+        :failed_rows += {rowIndex, "brgNoValue not found in BomWos"};
+        :failed_rows_brg += {brgNoValue};
+        ' skip row
+      endif
+      ' ------------------------------------------------------
+
+    endwhile (no)
+
+    :Print failed_rows_brg, failed_rows_machine;
+    :Return {"status":"success"};
+    stop
+
+  else
+    :Alert: Invalid file type (must be CSV/XLSX);
+    stop
+  endif
+else
+  :Alert: Filename must start with 'toolLimitAndCapa';
+  stop
+endif
+@enduml

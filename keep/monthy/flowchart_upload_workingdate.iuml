@@ -1,0 +1,81 @@
+@startuml
+title Flowchart Validate workingDate - v0.0.2
+
+start
+:Input file;
+
+if (Filename starts with 'workingDate'?) then (yes)
+  if (Filetype is .csv or .xlsx?) then (yes)
+    :Read file into DataFrame (CSV/XLSX);
+    :Drop columns matched '^Unnamed';
+
+    ' -------- Header check (loop) --------
+    :required = [workingDate, workingHr];
+    while (More required headers?) is (yes)
+      :col = next required;
+      if (col exists in DataFrame headers?) then (yes)
+      else
+        :Alert: Missing required column '{col}';
+        stop
+      endif
+    endwhile (no)
+
+    ' -------- Empty check (loop) --------
+    :rowIndex = 1;
+    while (More rows to check empty?) is (yes)
+      :row = next;
+      if (Any of [workingDate, workingHr] empty?) then (yes)
+        :Alert: Empty cell at row {rowIndex};
+        stop
+      else
+        :rowIndex = rowIndex + 1;
+      endif
+    endwhile (no)
+
+    ' -------- Number check for workingHr (loop) --------
+    :rowIndex = 1;
+    while (More rows to check number?) is (yes)
+      :row = next;
+      if (workingHr is numeric and no commas?) then (yes)
+        :rowIndex = rowIndex + 1;
+      else
+        :Alert: Invalid 'workingHr' at row {rowIndex}\\n(commas not allowed);
+        stop
+      endif
+    endwhile (no)
+
+    ' -------- Date check for workingDate (loop) --------
+    :rowIndex = 1;
+    while (More rows to check date?) is (yes)
+      :row = next;
+      if (workingDate valid format?
+[dd/mm/yyyy, d/m/yyyy, dd/m/yyyy, d/mm/yyyy]) then (yes)
+        :rowIndex = rowIndex + 1;
+      else
+        :Alert: Invalid 'workingDate' at row {rowIndex};
+        stop
+      endif
+    endwhile (no)
+
+    ' -------- Unknown check (loop) --------
+    :rowIndex = 1;
+    while (More rows to check unknown?) is (yes)
+      :row = next;
+      if ("unknown" (case-insensitive) appears in any field?) then (yes)
+        :Alert: Found 'unknown' at row {rowIndex};
+        stop
+      else
+        :rowIndex = rowIndex + 1;
+      endif
+    endwhile (no)
+    stop
+
+  else
+    :Alert: Invalid file type (must be CSV/XLSX);
+    stop
+  endif
+else
+  :Alert: Filename must start with 'workingDate';
+  stop
+endif
+@enduml

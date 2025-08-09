@@ -1,0 +1,35 @@
+@startuml
+start
+
+:User Navigate to preview page;
+:Display summary and preview;
+:Click Create Plan;
+
+if (modify?) then (yes)
+  :User selects file (working_day or capacity);
+  :Display file name;
+  :User clicks Upload;
+
+  partition "Validate Data" {
+    :Check required fields not empty;
+    :Check data types (number, date);
+    :Check duplicates;
+    :Check qty > 0;
+    :Check balance_order > 0;
+    :Check header columns;
+    :Check unknown columns;
+    :Check machine available;
+  }
+
+  if (Valid CSV?) then (yes)
+    :Insert into DB;
+    :Show success + preview;
+  else (no)
+    :Show error alert;
+  endif
+
+else (no)
+endif
+
+stop
+@enduml

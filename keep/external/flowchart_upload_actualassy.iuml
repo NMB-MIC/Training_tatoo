@@ -1,0 +1,73 @@
+@startuml
+title Flowchart Upload ActualAssy - release v0.0.1
+start
+:Input file;
+
+if (Filename == 'productionPlanActual'?) then (yes)
+  if (Filetype is CSV or XLSX?) then (yes)
+    if (Column 1 == 'brgNoValue'?) then (yes)
+      if (Column 2 == 'machineNo'?) then (yes)
+        if (Column 3 == 'workingDate'?) then (yes)
+          if (Column 4 == 'actualOutput'?) then (yes)
+
+            :Loop through each row;
+
+            if (Row has NaN or 'unknown'?) then (yes)
+              :Alert: Found NaN or 'unknown' in row;
+              stop
+            endif
+
+            if (actualOutput format valid?\n(no commas)) then (yes)
+              if (workingDate format valid?\n(dd/mm/yyyy, etc.)) then (yes)
+                if (brgNoValue exists in BomWos?) then (yes)
+                  if (machineNo exists in MachineLayout?) then (yes)
+
+                    :Get last rev of ProductionPlanActual;
+                    :Map bomWosId and machineLayoutId;
+                    :Insert into ProductionPlanActual;
+                    :Alert: Upload success;
+                    stop
+
+                  else
+                    :Alert: machineNo not found in MachineLayout;
+                    stop
+                  endif
+                else
+                  :Alert: brgNoValue not found in BomWos;
+                  stop
+                endif
+              else
+                :Alert: Invalid date format;
+                stop
+              endif
+            else
+              :Alert: Invalid number format (no commas allowed);
+              stop
+            endif
+
+          else
+            :Alert: Column 4 must be 'actualOutput';
+            stop
+          endif
+        else
+          :Alert: Column 3 must be 'workingDate';
+          stop
+        endif
+      else
+        :Alert: Column 2 must be 'machineNo';
+        stop
+      endif
+    else
+      :Alert: Column 1 must be 'brgNoValue';
+      stop
+    endif
+
+  else
+    :Alert: Invalid file type (must be CSV/XLSX);
+    stop
+  endif
+else
+  :Alert: Filename must be 'productionPlanActual';
+  stop
+endif
+@enduml

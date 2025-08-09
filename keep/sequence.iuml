@@ -1,0 +1,657 @@
+@startuml
+actor User
+participant "Frontend" as FE
+participant "Backend" as BE
+database "Database" as DB
+title System Diagram - release v0.0.1
+
+== Upload Master Files ==
+group Master Upload
+  User -> FE : Select bomWos.csv
+  activate FE
+  FE -> FE : Show selected file name
+  User -> FE : Click "Upload"
+  FE -> BE : POST /data_management/bom_wos/upload
+  
+  activate BE
+  group Validate BOM WOS
+    BE -> BE : Check file name
+    BE -> BE : Check file type (CSV/XLSX)
+    BE -> BE : Check header columns
+    BE -> BE : Check required fields not empty
+    BE -> BE : Check unknown
+    BE -> BE : Check pattern (number, date)
+    BE -> BE : Check qty > 0
+    BE -> BE : Check duplicates key
+  
+    alt Validation Passed
+      BE -> DB : Insert_bomWos_records
+      DB --> BE : OK
+      BE --> FE : Return success + preview
+    else Validation Failed
+      BE --> FE : Return error message
+      FE -> FE : Show alert message invalid data
+    end
+    deactivate FE
+  end
+  deactivate BE
+  User -> FE : Select machineGroup.csv
+  activate FE
+  FE -> FE : Show selected file name
+  User -> FE : Click "Upload"
+  FE -> BE : POST /data_management/machine_group/upload
+  activate BE
+  group Validate MACHINE GROUP
+    BE -> BE : Check file name
+    BE -> BE : Check file type (CSV/XLSX)
+    BE -> BE : Check header columns
+    BE -> BE : Check required fields not empty
+    BE -> BE : Check unknown
+    BE -> BE : Check duplicates key
+  
+    alt Validation Passed
+      BE -> DB : Insert_machineGroup_records
+      DB --> BE : OK
+      BE --> FE : Return success + preview
+    else Validation Failed
+      BE --> FE : Return error message
+      FE -> FE : Show alert message invalid data
+    end
+    deactivate FE
+  end
+  deactivate BE
+  User -> FE : Select machineLayout.csv
+  activate FE
+  FE -> FE : Show selected file name
+  User -> FE : Click "Upload"
+  FE -> BE : POST /data_management/machine_layout/upload
+  activate BE
+  group Validate MACHINE LAYOUT
+    BE -> BE : Check file name
+    BE -> BE : Check file type (CSV/XLSX)
+    BE -> BE : Check header columns
+    BE -> BE : Check required fields not empty
+    BE -> BE : Check unknown
+    BE -> BE : Check duplicates key
+    
+    alt Validation Passed
+      BE -> DB : Insert_machineLayout_records
+      DB --> BE : OK
+      BE --> FE : Return success + preview
+    else Validation Failed
+      BE --> FE : Return error message
+      FE -> FE : Show alert message invalid data
+    end
+    deactivate FE
+  end
+  deactivate BE
+  User -> FE : Select toolLimitAndCapa.csv
+  activate FE
+  FE -> FE : Show selected file name
+  User -> FE : Click "Upload"
+  FE -> BE : POST /data_management/toolLimitAndCapa/upload
+  activate BE
+  group Validate TOOL LIMIT AND CAPA
+    BE -> BE : Check file name
+    BE -> BE : Check file type (CSV/XLSX)
+    BE -> BE : Check header columns
+    BE -> BE : Check required fields not empty
+    BE -> BE : Check unknown
+    BE -> BE : Check pattern (number)
+    BE -> BE : Check duplicates key
+    
+    alt Validation Passed
+      BE -> DB : Insert_toolLimitAndCapa_records
+      DB --> BE : OK
+      BE --> FE : Return success + preview
+    else Validation Failed
+      BE --> FE : Return error message
+      FE -> FE : Show alert message invalid data
+    end
+    deactivate FE
+  end
+  deactivate BE
+  User -> FE : Select fac1.csv
+  activate FE
+  FE -> FE : Show selected file name
+  User -> FE : Click "Upload"
+  FE -> BE : POST /data_management/fac1/upload
+  activate BE
+  group Validate FAC1
+    BE -> BE : Check file name
+    BE -> BE : Check file type (CSV/XLSX)
+    BE -> BE : Check header columns
+    BE -> BE : Check required fields not empty
+    BE -> BE : Check unknown
+    BE -> BE : Check duplicates key
+    
+    alt Validation Passed
+      BE -> DB : Insert_fac1_records
+      DB --> BE : OK
+      BE --> FE : Return success + preview
+    else Validation Failed
+      BE --> FE : Return error message
+      FE -> FE : Show alert message invalid data
+    end
+    deactivate FE
+  end
+  deactivate BE
+  User -> FE : Select fac3.csv
+  activate FE
+  FE -> FE : Show selected file name
+  User -> FE : Click "Upload"
+  FE -> BE : POST /data_management/fac3/upload
+  activate BE
+  group Validate FAC3
+    BE -> BE : Check file name
+    BE -> BE : Check file type (CSV/XLSX)
+    BE -> BE : Check header columns
+    BE -> BE : Check required fields not empty
+    BE -> BE : Check unknown
+    BE -> BE : Check duplicates key
+    
+    alt Validation Passed
+      BE -> DB : Insert_fac3_records
+      DB --> BE : OK
+      BE --> FE : Return success + preview
+    else Validation Failed
+      BE --> FE : Return error message
+      FE -> FE : Show alert message invalid data
+    end
+    deactivate FE
+  end
+  deactivate BE
+  User -> FE : Select sleeveAndThrustBrg.csv
+  activate FE
+  FE -> FE : Show selected file name
+  User -> FE : Click "Upload"
+  FE -> BE : POST /data_management/sleeve_and_thrust_brg/upload
+  activate BE
+  group Validate SLEEVE AND THRUSTBRG
+    BE -> BE : Check file name
+    BE -> BE : Check file type (CSV/XLSX)
+    BE -> BE : Check header columns
+    BE -> BE : Check required fields not empty
+    BE -> BE : Check unknown
+    BE -> BE : Check duplicates key
+    
+    alt Validation Passed
+      BE -> DB : Insert_sleeveAndThrustBrg_records
+      DB --> BE : OK
+      BE --> FE : Return success + preview
+    else Validation Failed
+      BE --> FE : Return error message
+      FE -> FE : Show alert message invalid data
+    end
+    deactivate FE
+  end
+  deactivate BE
+
+  User -> FE : Select Topic bomWos
+  activate FE
+  FE -> FE : Show Topic name
+  FE -> BE : GET /data_management/bomWos/
+  activate BE
+  BE -> DB : get_all_bomWos
+  activate DB
+  DB --> BE : return data
+  deactivate DB
+  BE --> FE : Show data
+  deactivate BE
+  deactivate FE
+  User -> FE : Select Topic machineGroup
+  activate FE
+  FE -> FE : Show Topic name
+    FE -> BE : GET /data_management/machineGroup/
+  activate BE
+  BE -> DB : get_all_machine_groups
+  activate DB
+  DB --> BE : return data
+  deactivate DB
+  BE --> FE : Show data
+  deactivate BE
+  deactivate FE 
+  User -> FE : Select Topic machineLayout
+  activate FE
+  FE -> FE : Show Topic name
+    FE -> BE : GET /data_management/machineLayout/
+  activate BE
+  BE -> DB : get_all_machine_layout
+  activate DB
+  DB --> BE : return data
+  deactivate DB
+  BE --> FE : Show data
+  deactivate BE
+  deactivate FE
+  User -> FE : Select Topic toolLimitAndCapa
+  activate FE
+  FE -> FE : Show Topic name
+    FE -> BE : GET /data_management/toolLimitAndCapa/
+  activate BE
+  BE -> DB : get_all_tool_limit_and_capa
+  activate DB
+  DB --> BE : return data
+  deactivate DB
+  BE --> FE : Show data
+  deactivate BE
+  deactivate FE
+  User -> FE : Select Topic fac1
+  activate FE
+  FE -> FE : Show Topic name
+    FE -> BE : GET /data_management/fac1/
+  activate BE
+  BE -> DB : get_all_fac_1
+  activate DB
+  DB --> BE : return data
+  deactivate DB
+  BE --> FE : Show data
+  deactivate BE
+  deactivate FE
+  User -> FE : Select Topic fac3
+  activate FE
+  FE -> FE : Show Topic name
+    FE -> BE : GET /data_management/fac3/
+  activate BE
+  BE -> DB : get_all_fac_3
+  activate DB
+  DB --> BE : return data
+  deactivate DB
+  BE --> FE : Show data
+  deactivate BE
+  deactivate FE 
+  User -> FE : Select Topic sleeveAndThrustBrg
+  activate FE
+  FE -> FE : Show Topic name
+    FE -> BE : GET /data_management/sleeveAndThrustBrg/
+  activate BE
+  BE -> DB : get_all_sleeve_and_thrust_brg
+  activate DB
+  DB --> BE : return data
+  deactivate DB
+  BE --> FE : Show data
+  deactivate BE
+  deactivate FE
+
+== Upload Month Files ==
+
+  User -> FE : Select balanceOrderMidSmall.csv
+  activate FE
+  FE -> FE : Show selected file name
+  User -> FE : Select machineNotAvailable.csv
+  FE -> FE : Show selected file name
+  User -> FE : Select productionPlan.csv
+  FE -> FE : Show selected file name
+  User -> FE : Select kpiSetup.csv
+  FE -> FE : Show selected file name
+  User -> FE : Select kpiProduction.csv
+  FE -> FE : Show selected file name
+  User -> FE : Select workingDate.csv
+  FE -> FE : Show selected file name
+  User -> FE : Click "Upload"
+  FE -> BE : POST /data_management/monthy/upload
+  activate BE
+  group Validate BALANCE ORDER MID SMALL
+    BE -> BE : Check file name
+    BE -> BE : Check file type (CSV/XLSX)
+    BE -> BE : Check header columns
+    BE -> BE : Check required fields not empty
+    BE -> BE : Check unknown
+    BE -> BE : Check pattern (number, date)
+    BE -> BE : Check duplicates key
+  
+    alt Validation Passed
+      BE -> DB : Insert_balanceOrderMidSmall_records
+      DB --> BE : OK
+      BE --> FE : Return success + preview
+    else Validation Failed
+      BE --> FE : Return error message
+      FE -> FE : Show alert message invalid data
+    end
+  end
+
+  group Validate MACHINE NOT AVAILABLE
+    BE -> BE : Check file name
+    BE -> BE : Check file type (CSV/XLSX)
+    BE -> BE : Check header columns
+    BE -> BE : Check required fields not empty
+    BE -> BE : Check unknown
+    BE -> BE : Check duplicates key
+  
+    alt Validation Passed
+      BE -> DB : Insert_machineNotAvailable_records
+      DB --> BE : OK
+      BE --> FE : Return success + preview
+    else Validation Failed
+      BE --> FE : Return error message
+      FE -> FE : Show alert message invalid data
+    end
+  end
+
+  group Validate PRODUCTION PLAN
+    BE -> BE : Check file name
+    BE -> BE : Check file type (CSV/XLSX)
+    BE -> BE : Check header columns
+    BE -> BE : Check required fields not empty
+    BE -> BE : Check unknown
+    BE -> BE : Check duplicates key
+    alt Validation Passed
+      BE -> DB : Insert_productionPlan_records
+      DB --> BE : OK
+      BE --> FE : Return success + preview
+    else Validation Failed
+      BE --> FE : Return error message
+      FE -> FE : Show alert message invalid data
+    end
+    
+  end
+
+  group Validate KPI SETUP
+    BE -> BE : Check file name
+    BE -> BE : Check file type (CSV/XLSX)
+    BE -> BE : Check header columns
+    BE -> BE : Check required fields not empty
+    BE -> BE : Check unknown
+    BE -> BE : Check pattern (number)
+    BE -> BE : Check duplicates key
+    alt Validation Passed
+      BE -> DB : Insert_kpiSetup_records
+      DB --> BE : OK
+      BE --> FE : Return success + preview
+    else Validation Failed
+      BE --> FE : Return error message
+      FE -> FE : Show alert message invalid data
+    end
+  end
+
+  group Validate KPI PRODUCTION
+    BE -> BE : Check file name
+    BE -> BE : Check file type (CSV/XLSX)
+    BE -> BE : Check header columns
+    BE -> BE : Check required fields not empty
+    BE -> BE : Check unknown
+    BE -> BE : Check pattern (number)
+    alt Validation Passed
+      BE -> DB : Insert_kpiProduction_records
+      DB --> BE : OK
+      BE --> FE : Return success + preview
+    else Validation Failed
+      BE --> FE : Return error message
+      FE -> FE : Show alert message invalid data
+    end
+  end
+
+  group Validate WORKING DATE
+    BE -> BE : Check file name
+    BE -> BE : Check file type (CSV/XLSX)
+    BE -> BE : Check header columns
+    BE -> BE : Check required fields not empty
+    BE -> BE : Check unknown
+    BE -> BE : Check pattern (number, date)
+    BE -> BE : Check duplicates key
+    alt Validation Passed
+      BE -> DB : Insert_workingDate_records
+      DB --> BE : OK
+      BE --> FE : Return success + preview
+    else Validation Failed
+      BE --> FE : Return error message
+      FE -> FE : Show alert message invalid data
+    end
+  end
+  deactivate BE
+  deactivate FE
+
+  User -> FE : Select Topic MID SMALL
+  activate FE
+  FE -> FE : Show Topic name
+  FE -> BE : GET /data_management/balanceOrderMidSmall/
+  activate BE
+  BE -> DB : get_all_balanceOrderMidSmall
+  activate DB
+  DB --> BE : return data
+  deactivate DB
+  BE --> FE : Show data
+  deactivate BE
+  deactivate FE
+  User -> FE : Select Topic MACHINE NOT AVAILABLE
+  activate FE
+  FE -> FE : Show Topic name
+    FE -> BE : GET /data_management/machineNotAvailable/
+  activate BE
+  BE -> DB : get_all_machineNotAvailable
+  activate DB
+  DB --> BE : return data
+  deactivate DB
+  BE --> FE : Show data
+  deactivate BE
+  deactivate FE 
+  User -> FE : Select Topic PRODUCTION PLAN
+  activate FE
+  FE -> FE : Show Topic name
+    FE -> BE : GET /data_management/productionPlan/
+  activate BE
+  BE -> DB : get_all_productionPlan
+  activate DB
+  DB --> BE : return data
+  deactivate DB
+  BE --> FE : Show data
+  deactivate BE
+  deactivate FE
+  User -> FE : Select Topic KPI SETUP
+  activate FE
+  FE -> FE : Show Topic name
+    FE -> BE : GET /data_management/kpiSetup/
+  activate BE
+  BE -> DB : get_all_kpiSetup
+  activate DB
+  DB --> BE : return data
+  deactivate DB
+  BE --> FE : Show data
+  deactivate BE
+  deactivate FE
+  User -> FE : Select Topic KPI PRODUCTION
+  activate FE
+  FE -> FE : Show Topic name
+    FE -> BE : GET /data_management/kpiProduction/
+  activate BE
+  BE -> DB : get_all_kpiProduction
+  activate DB
+  DB --> BE : return data
+  deactivate DB
+  BE --> FE : Show data
+  deactivate BE
+  deactivate FE
+  User -> FE : Select Topic WORKING DATE
+  activate FE
+  FE -> FE : Show Topic name
+    FE -> BE : GET /data_management/workingDate/
+  activate BE
+  BE -> DB : get_all_workingDate
+  activate DB
+  DB --> BE : return data
+  deactivate DB
+  BE --> FE : Show data
+  deactivate BE
+  deactivate FE
+== Preview Plan Page ==
+User -> FE : Navigate to preview page
+activate FE
+FE -> BE : GET /data_management/working_plan_data/get
+activate BE
+BE -> DB : Select_working_plan_data
+activate DB
+DB --> BE : Return working_plan_data
+deactivate DB
+BE --> FE : Return working_plan_data for preview
+deactivate BE
+FE -> FE : Render working_plan_data
+deactivate FE
+
+par Upload working files
+  User -> FE : Upload working_day.csv
+  activate FE
+  FE -> FE : Show selected file name
+  User -> FE : Click "Upload"
+  FE -> BE : POST /data_management/working_day/upload
+  activate BE
+  group Validate WORKING DATE
+    BE -> BE : Check file name
+    BE -> BE : Check file type (CSV/XLSX)
+    BE -> BE : Check header columns
+    BE -> BE : Check required fields not empty
+    BE -> BE : Check unknown
+    BE -> BE : Check pattern (number, date)
+    BE -> BE : Check duplicates key
+  
+    alt Validation Passed
+      BE -> DB : Insert_workingDate_records
+      DB --> BE : OK
+      BE --> FE : Return success + preview
+    else Validation Failed
+      BE --> FE : Return error message
+      FE -> FE : Show alert message invalid data
+    end
+  end
+  deactivate BE
+  deactivate FE
+  User -> FE : Upload toolLimitAndCapa.csv
+  activate FE
+  FE -> FE : Show selected file name
+  User -> FE : Click "Upload"
+  FE -> BE : POST /data_management/toolLimitAndCapa/upload
+  activate BE
+  group Validate TOOL LIMIT AND CAPA
+    BE -> BE : Check file name
+    BE -> BE : Check file type (CSV/XLSX)
+    BE -> BE : Check header columns
+    BE -> BE : Check required fields not empty
+    BE -> BE : Check unknown
+    BE -> BE : Check pattern (number)
+    BE -> BE : Check duplicates key
+    
+    alt Validation Passed
+      BE -> DB : Insert_toolLimitAndCapa_records
+      DB --> BE : OK
+      BE --> FE : Return success + preview
+    else Validation Failed
+      BE --> FE : Return error message
+      FE -> FE : Show alert message invalid data
+    end
+    deactivate BE
+    deactivate FE
+  end
+  
+end
+
+User -> FE : Click "Create Plan"
+activate FE
+FE -> BE : POST /data_management/create_plan/upload
+activate BE
+BE -> BE : Final validation
+alt Valid
+  BE -> DB : Insert_plan data
+  activate DB
+  DB --> BE : OK
+  deactivate DB
+  BE --> FE : Return confirmation
+  FE -> FE : Show success
+else Error
+  BE --> FE : Return error
+  deactivate BE
+  FE -> FE : Show alert
+  deactivate FE
+end
+
+
+== Report Page ==
+User -> FE : Navigate to report page
+activate FE
+User -> FE : Upload actual_assy.csv
+FE -> FE : Show selected file name
+User -> FE : Click "Upload"
+FE -> BE : POST /data_management/actual_assy/upload
+activate BE
+  group Validate ACTUAL ASSY
+    BE -> BE : Check file name
+    BE -> BE : Check file type (CSV/XLSX)
+    BE -> BE : Check header columns
+    BE -> BE : Check required fields not empty
+    BE -> BE : Check unknown
+    BE -> BE : Check pattern (number, date)
+    BE -> BE : Check duplicates key
+  
+    alt Validation Passed
+      BE -> DB : Insert_actual_assy_records
+      DB --> BE : OK
+      BE --> FE : Return success + preview
+    else Validation Failed
+      BE --> FE : Return error message
+      deactivate BE
+      FE -> FE : Show alert message invalid data
+    end
+    deactivate FE
+  end
+
+User -> FE : Select month + view type (Actual/Combine)
+activate FE
+FE -> BE : GET /data_management/report_data?month=MM/get
+activate BE
+BE -> DB : Select_actual_data
+activate DB
+DB --> BE : Return actual_data
+BE --> FE : Return report actual_data
+BE -> DB : Select_plan_data
+DB --> BE : Return plan_data
+deactivate DB
+BE --> FE : Return report plan_data
+deactivate BE
+FE -> FE : Render report table/charts
+deactivate FE
+
+User -> FE : Click "Download Report"
+activate FE
+FE -> BE : GET /data_management/download_report?month=MM&type=.../download
+activate BE
+BE -> BE : Generate report file
+BE --> FE : Return file
+deactivate BE
+FE -> User : Trigger file download
+deactivate FE
+
+== View Plan Result ==
+User -> FE : Navigate to Plan Result Page
+activate FE
+FE -> BE : GET /data_management/plan_result/get
+activate BE
+BE -> DB : Select_plan_data
+activate DB
+DB --> BE : Return plan_data_records
+deactivate DB
+BE --> FE : Return data
+deactivate BE
+FE -> FE : Render plan table
+deactivate FE
+
+User -> FE : Click "Download Plan"
+activate FE
+FE -> BE : GET /data_management/download_plan?plan_id=.../download
+activate BE
+BE -> BE : Generate file (CSV/XLSX)
+BE --> FE : Return file
+deactivate BE
+FE -> User : Trigger download
+deactivate FE
+
+User -> FE : Click "Approve"
+activate FE
+FE -> BE : POST /data_management/approve_plan/upload(send plan_id)
+activate BE
+BE -> DB : Update_plan_status = "Approved"
+activate DB
+DB --> BE : OK
+deactivate DB
+BE --> FE : Return confirmation
+deactivate BE
+FE -> FE : Show success message
+deactivate FE
+
+@enduml

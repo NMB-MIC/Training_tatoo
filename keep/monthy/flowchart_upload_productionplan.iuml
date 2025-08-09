@@ -1,0 +1,56 @@
+@startuml
+title Flowchart Validate ProductionPlan - v0.0.2
+
+start
+:Input file;
+
+if (Filename starts with 'productionPlan'?) then (yes)
+  if (Filetype is .csv or .xlsx?) then (yes)
+    :Read file into DataFrame (CSV/XLSX);
+    :Drop columns matched '^Unnamed';
+
+    ' -------- Header check (loop) --------
+    :required = [machineNo, brgNoValue];
+    while (More required headers?) is (yes)
+      :col = next required;
+      if (col exists in DataFrame headers?) then (yes)
+      else
+        :Alert: Missing required column '{col}';
+        stop
+      endif
+    endwhile (no)
+
+    ' -------- Empty check (loop) --------
+    :rowIndex = 1;
+    while (More rows to check empty?) is (yes)
+      :row = next;
+      if (Any of [machineNo, brgNoValue] empty?) then (yes)
+        :Alert: Empty cell at row {rowIndex};
+        stop
+      else
+        :rowIndex = rowIndex + 1;
+      endif
+    endwhile (no)
+
+    ' -------- Unknown check (loop) --------
+    :rowIndex = 1;
+    while (More rows to check unknown?) is (yes)
+      :row = next;
+      if ("unknown" (case-insensitive) appears in any field?) then (yes)
+        :Alert: Found 'unknown' at row {rowIndex};
+        stop
+      else
+        :rowIndex = rowIndex + 1;
+      endif
+    endwhile (no)
+    stop
+
+  else
+    :Alert: Invalid file type (must be CSV/XLSX);
+    stop
+  endif
+else
+  :Alert: Filename must start with 'productionPlan';
+  stop
+endif
+@enduml

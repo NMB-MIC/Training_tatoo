@@ -1,0 +1,108 @@
+@startuml
+title Flowchart Insert Monthly - release v0.0.2
+
+start
+:Start Insert Monthly Process;
+:Init counters & lists for each dataset;
+
+:Begin DB Transaction;
+
+' ================= BalanceOrderMidSmall =================
+:Get last rev of BalanceOrderMidSmall -> last_rev;
+:rev = (last_rev ? last_rev + 1 : 1);
+
+while (rows in mid_small_df?) is (yes)
+  :row = next;
+  if (Find BomWos WHERE wosNo==row.wosNo) then (found)
+    :Insert BalanceOrderMidSmall(rev=rev, ... , bomWosId=BomWos.id;
+    :BalanceOrderMidSmall_inserted++;
+  else
+    :BalanceOrderMidSmall_failed += {rowIndex+2, "wosNo not found in BomWos"};\nskip row;
+  endif
+endwhile (no)
+
+' ================= MachineNotAvailable =================
+:Get last rev of MachineNotAvailable -> last_rev;
+:rev = (last_rev ? last_rev + 1 : 1);
+
+while (rows in machine_not_available_df?) is (yes)
+  :row = next; :machineNo=row.machineNo;
+  if (Find MachineLayout WHERE machineNo==mNo) then (found)
+    if (Find Machine WHERE machineLayoutId==MachineLayout.id) then (found)
+      :Insert MachineNotAvailable(rev=rev, machineId=Machine.id;
+      :MachineNotAvailable_inserted++;
+    else
+      :log "Machine not found for machineLayoutId";\nskip row;
+    endif
+  else
+    :log "MachineLayout not found for machineNo {mNo}";\nskip row;
+  endif
+endwhile (no)
+
+' ================= ProductionPlan =================
+:Get last rev of ProductionPlan -> last_rev;
+:rev = (last_rev ? last_rev + 1 : 1);
+
+while (rows in production_plan_df?) is (yes)
+  :row = next; :machineNo=row.machineNo; :brgNoValue=row.brgNoValue;
+
+  if (Find BomWos WHERE brgNoValue==brgNoValue) then (found)
+    if (Find MachineLayout WHERE machineNo==mNo) then (found)
+      if (Find Machine WHERE machineLayoutId==MachineLayout.id) then (found)
+        :Insert ProductionPlan(rev=rev, machineId=Machine.id, bomWosId=BomWos.id;
+        :ProductionPlan_inserted++;
+      else
+        :log " Machine not found for machineLayoutId";\nskip row;
+      endif
+    else
+      :log "MachineLayout not found for machineNo {mNo}";\nskip row;
+    endif
+  else
+    :PP_failed += {rowIndex+2, "brgNoValue not found in BomWos"};\nskip row;
+  endif
+endwhile (no)
+
+' ================= KpiSetup =================
+:Get last rev of KpiSetup -> last_rev;
+:rev = (last_rev ? last_rev + 1 : 1);
+
+while (rows in kpi_setup_df?) is (yes)
+  :row = next; :machineGroup=row.machineGroup; :setupAverage=row.setupAverage; :maxSetUpPerDay=row.maxSetUpPerDay;
+  if (Find Machine WHERE machineGroup==mg) then (found)
+    :Insert KpiSetup(rev=rev, machineTypeId=Machine.id, setupAverage=setupAverage, maxSetUpPerDay=maxSetUpPerDay;
+    :KpiSetup_inserted++;
+  else
+    :log "MachineGroup not found: {machineGroup}";\nskip row;
+  endif
+endwhile (no)
+
+' ================= KpiProduction =================
+:Get last rev of KpiProduction -> last_rev;
+:rev = (last_rev ? last_rev + 1 : 1);
+
+while (rows in kpi_production_df?) is (yes)
+  :row = next;
+  :Insert KpiProduction(rev=rev, autoMachineDailyTarget=row.autoMachineDailyTarget, manualDailyTarget=row.manualDailyTarget);
+  :KpiProduction_inserted++;
+endwhile (no)
+
+' ================= WorkingDate =================
+:Get last rev of WorkingDate -> last_rev;
+:rev = (last_rev ? last_rev + 1 : 1);
+
+while (rows in working_date_df?) is (yes)
+  :row = next;
+  :Insert WorkingDate(rev=rev, workingDate=row.workingDate, workingHr=row.workingHr);
+  :WorkingDate_inserted++;
+endwhile (no)
+
+' ================= Final Commit =================
+if (Commit OK?) then (yes)
+  :Return success + summary (each dataset inserted + failed/logged);
+  stop
+else (DB error on commit)
+  :Rollback Transaction;
+  :Alert: DB error on final commit;\nProcess failed;
+  stop
+endif
+@enduml

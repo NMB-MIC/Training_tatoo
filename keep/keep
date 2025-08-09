@@ -1,0 +1,219 @@
+
+upload bom_wos{
+if check filename = 'bom_wos' 
+if check file type = csv or xlsx
+if check coloum 1 = 'updateAt'
+if check coloum 2 = 'wosNo'
+if check coloum 3 = 'brgNoValue'
+if check coloum 4 = 'partNoValue'
+if check coloum 5 = 'partComponentGroup'
+if check coloum 6 = 'qty'
+if check coloum 7 = 'parentPartNo'
+if check pattern number = 'xxxx' not 'x,xxx'
+if check pattern date = 'dd/mm/yyyy' or 'dd/m/yyyy' or 'd/mm/yyyy'or 'd/m/yyyy'
+
+loop check row = NaN or 'unknown'
+
+loop check qty > 0
+
+loop check duplicates partNoValue parentPartNo brgNoValue
+if check return error and alert
+
+if seccess
+insert table BomWos
+else
+}
+
+upload machine_group{
+check filename = 'machineGroup'
+check file type = csv or xlsx
+check coloum 1 = 'machineNo'
+check coloum 2 = 'machineType'
+check coloum 3 = 'machineGroup'
+
+loop check row = NaN or 'unknown'
+
+split coloum 'machineType'
+
+insert table MachineType
+
+loop check duplicates machineNo = machine_layout.machineNo 
+loop check duplicates machineType = MachineType.id 
+
+insert table Machine condition MachineLayoutId =  MachineLayout.id and MachineTypeId = MachineType.id 
+}
+
+upload machine_layout{
+check filename = 'machineLayout'
+check file type = csv or xlsx
+check coloum 1 = 'lineNo'
+check coloum 2 = 'machineNo'
+check coloum 3 = 'locationNo'
+
+loop check row = NaN or 'unknown'
+
+loop check duplicates lineNo machineNo locationNo
+if check return error and alert
+
+seccess
+insert table MachineLayout
+}
+
+upload kpi_setup{
+check filename = 'kpiSetup'
+check file type = csv or xlsx
+check coloum 1 = 'machineType'
+check coloum 2 = 'setupAverage'
+check coloum 3 = 'maxSetUpPerDay'
+
+loop check row = NaN or 'unknown'
+
+loop check duplicates machineType = MachineType.machineType
+}
+
+upload tool_limit&capa{
+check filename = 'toolLimitAndCapa'
+check file type = csv or xlsx
+check coloum 1 = 'brgNoValue'
+check coloum 2 = 'groupBrgNoValue'
+check coloum 3 = 'machineGroup'
+check coloum 4 = 'machineType'
+check coloum 5 = 'machineNo'
+check coloum 6 = 'groupBrgAndMcGroup'
+check coloum 7 = 'limitByType'
+check coloum 8 = 'limitByGroup'
+check coloum 9 = 'joinToolingPartNo'
+check coloum 10 = 'joinToolingMc'
+check coloum 11 = 'capaDay'
+check coloum 12 = 'utilizeMc'
+check coloum 13 = 'cycleTime'
+check coloum 14 = 'capaF3'
+
+
+loop check row = NaN or 'unknown'
+loop check pattern number = 'xxxx' not 'x,xxx'
+
+loop check duplicates brgNoValue = BomWos.brgNoValue 
+                      groupBrgNoValue = BomWos.groupBrgNoValue
+                      machineGroup = Machine.machineGroup
+                      machineType = Machine.machineTypeId มาจาก table machineType
+                      machineNo = Machine.machineLayoutId มาจาก table machineLayout
+insert table Capacity condition MachineId =  Machine.id
+}
+
+upload fac1{
+check filename = 'fac1'
+check file type = csv or xlsx
+check coloum 1 = 'brgNoValue'
+check coloum 2 = 'groupBrgNoValue'
+
+loop check row = NaN or 'unknown'
+
+loop check duplicates brgNoValue = BomWos.brgNoValue 
+                      groupBrgNoValue = BomWos.groupBrgNoValue
+insert table PartAssy condition bomWosId =  BomWos.id
+}
+
+
+
+input file balance_order_mid_small{
+if check filename = 'balanceOrderMidSmall' 
+if check file type = csv or xlsx
+if check coloum 1 = 'targetPlanMonth'
+if check coloum 2 = 'orderNo'
+if check coloum 3 = 'dueDate'
+if check coloum 4 = 'balanceOrder'
+if check coloum 5 = 'partGroup'
+if check coloum 6 = 'wosNo'
+if check pattern number = 'xxxx' not 'x,xxx' col balance order
+if check pattern date = 'dd/mm/yyyy' or 'dd/m/yyyy' or 'd/mm/yyyy'or 'd/m/yyyy'
+loop check row = NaN or 'unknown'
+
+
+loop check duplicates wosNo = BomWos.wosNo 
+}
+
+input file machinenotavailable{
+if check filename = 'machineNotAvailable' 
+if check file type = csv or xlsx
+if check coloum 1 = 'machineNo'
+loop check row = NaN or 'unknown'
+
+
+loop check duplicates machineNo = MachineLayout.machineNo 
+}
+
+input file productionplan{
+if check filename = 'productionPlan' 
+if check file type = csv or xlsx
+if check coloum 1 = 'machineNo'
+if check coloum 2 = 'brgNoValue'
+loop check row = NaN or 'unknown'
+
+
+loop check duplicates machineNo = MachineLayout.machineNo
+                      brgNoValue = BomWos.brgNoValue
+}
+
+upload workingDate{
+check filename = 'workingDate'
+check file type = csv or xlsx
+check coloum 1 = 'workingDate'
+check coloum 2 = 'workingHr'
+if check pattern date = 'dd/mm/yyyy' or 'dd/m/yyyy' or 'd/mm/yyyy'or 'd/m/yyyy'
+loop check row = NaN or 'unknown'
+
+}
+
+upload kpiproduction{
+check filename = 'kpiProduction'
+check file type = csv or xlsx
+check coloum 1 = 'autoMachineDailyTarget'
+check coloum 2 = 'manualDailyTarget'
+loop check row = NaN or 'unknown'
+if check pattern number(autoMachineDailyTarget,manualDailyTarget) = 'xxxx' not 'x,xxx'
+}
+
+
+insert monthy{
+    get last rev BalanceOrderMidSmall
+    insert table BalanceOrderMidSmall condition bomWosId =  BomWos.id
+    get last rev MachineNoAvailable
+    insert table MachineNoAvailable condition machineLayoutId = MachineLayout.id
+    get last rev ProductionPlan
+    insert table ProductionPlan condition machineLayoutId = MachineLayout.id
+                                          bomWosId =  BomWos.id
+    get last rev KpiSetup
+    insert table KpiSetup condition machineTypeId = MachineType.id
+    get last rev KpiProduction
+    insert table KpiProduction
+    get last rev WorkingDate
+    insert table WorkingDate
+    if success return
+}
+
+input file actual_assy{
+if check filename = 'productionPlanActual' 
+if check file type = csv or xlsx
+if check coloum 1 = 'brgNoValue'
+if check coloum 2 = 'machineNo'
+if check coloum 3 = 'workingDate'
+if check coloum 4 = 'actualOutput'
+if check pattern number = 'xxxx' not 'x,xxx' col balance order
+if check pattern date = 'dd/mm/yyyy' or 'dd/m/yyyy' or 'd/mm/yyyy'or 'd/m/yyyy'
+loop check row = NaN or 'unknown'
+
+loop check duplicates brgNoValue = BomWos.brgNoValue
+                      machineNo = MachineLayout.machineNo
+
+get last rev ProductionPlanActual
+insert table ProductionPlanActual condition bomWosId =  BomWos.id
+                                            machineLayoutId = MachineLayout.id
+
+}
+
+create plan & insert plan
+
+select actual & select plan
+
+update plan stats = approved

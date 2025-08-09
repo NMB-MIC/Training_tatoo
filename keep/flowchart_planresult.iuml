@@ -1,0 +1,18 @@
+@startuml
+start
+
+:User navigates to Plan Result Page;
+:Display plan result;
+
+if (Download?) then (yes)
+  :Download plan;
+endif
+
+if (Approve plan?) then (yes)
+  :Send approve request;
+  :Update plan status to "Approved";
+  :Show success message;
+endif
+
+stop
+@enduml

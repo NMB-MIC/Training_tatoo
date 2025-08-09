@@ -1,0 +1,8 @@
+@startuml
+start
+
+:User navigates to Dashboard Page;
+:Display Dashboard;
+
+stop
+@enduml

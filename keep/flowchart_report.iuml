@@ -1,0 +1,38 @@
+@startuml
+start
+
+:User navigates to Report Page;
+:Display plan;
+
+  if (Upload file?) then (yes)
+    :Select file (assy.csv);
+    :Display file name;
+    :Click Upload;
+    :Parse CSV;
+
+    partition "Validate Data" {
+      :Check required fields not empty;
+      :Check data types (number, date);
+      :Check duplicates;
+      :Check qty > 0;
+      :Check balance_order > 0;
+      :Check header columns;
+      :Check unknown columns;
+      :Check machine available;
+    }
+
+    :Display Actual and Plan report;
+  else (no)
+    :Skip upload;
+    :Display Plan report;
+  endif
+
+
+if (Download?) then (yes)
+  :Download report;
+else (no)
+  :End without download;
+endif
+
+stop
+@enduml

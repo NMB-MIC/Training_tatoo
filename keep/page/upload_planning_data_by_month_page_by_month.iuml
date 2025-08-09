@@ -1,0 +1,31 @@
+@startsalt
+{
+    title UPLOAD PLANNING DATA PAGE
+ {/ <b>BY MONTH | MASTER }
+
+PLANNING DATA BY MONTH LIST
+ {T#
++ TOPIC GROUPS| TOPICS|TEMPLATE |TEMPLATE VERSION| FILE
++ BALANCE ORDER|MID SMALL|[dowload]|v.0.0.1|[file]
++ MACHINE|MACHINE NOT AVAILABLE|[dowload]|v.0.0.1|[file]
++ PLAN|PRODUCTION PLAN|[dowload]|v.0.0.1|[file]
++ KPI|KPI SETUP|[dowload]|v.0.0.1|[file]
++ KPI|KPI PRODUCTION|[dowload]|v.0.0.1|[file]
++ RESOURCE|WORKING DATE|[dowload]|v.0.0.1|[file]
+}
+[upload]
+
+FIND&SEARCH
+MONTH | ^SELECT^2025-10^ 
+---
+TOPICS | ^Select^ MID SMALL ^ MACHINE NOT AVAILABLE ^ PRODUCTION PLAN ^ KPI SETUP ^ KPI PRODUCTION ^ WORKING DATE ^
+---
+
+INFORMATION LIST
+{T#
++ wos_no|	brg_no_value|	part_no_value|	part_component_group|	qty|	parent_part_no
++ AT0421|	DDL-3017K1DSD21MTTP1MN|	1DL-3017HHMTTP2|	OR|	1|	1DL-3017HHMTTP2
+}
+release v0.0.2
+}
+@endsalt
