@@ -130,7 +130,7 @@ class KpiSetup(Base):
     rev: Mapped[int] = mapped_column(Integer, nullable=True)
     setupAverage: Mapped[Float] = mapped_column(Integer, nullable=True)
     maxSetUpPerDay: Mapped[str] = mapped_column(String(100), nullable=True)
-    machineTypeId: Mapped[str] = mapped_column(ForeignKey("MachineType.id", ondelete="CASCADE"))
+    machineId: Mapped[str] = mapped_column(ForeignKey("Machine.id", ondelete="CASCADE"))
 
 class KpiProduction(Base):
     __tablename__ = "KpiProduction"

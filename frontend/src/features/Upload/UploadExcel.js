@@ -44,6 +44,7 @@ export default function UploadPlanningPage() {
   const [selectedMonthTopic, setSelectedMonthTopic] = useState("");
   const [fileMap, setFileMap] = useState({});
   const [showData, setShowData] = useState([]);
+  const [deletingId, setDeletingId] = useState(null);
 
   const handleFileChange = (topic, file) => {
     setFileMap((prev) => ({
@@ -149,6 +150,52 @@ export default function UploadPlanningPage() {
     }
   };
 
+const handleDeleteRow = async (row) => {
+  if (!searchTopic) {
+    alert("ยังไม่ได้เลือกหัวข้อ (topic)");
+    return;
+  }
+
+  const id = row?.id;
+  if (id == null) {
+    alert("ลบไม่สำเร็จ: แถวนี้ไม่มีฟิลด์ id (โปรดปรับให้ตรงกับคีย์หลักของคุณ)");
+    return;
+  }
+
+  const ok = window.confirm(`ต้องการลบรายการ id=${id} ในหัวข้อ ${searchTopic} ใช่หรือไม่?`);
+  if (!ok) return;
+
+  setDeletingId(id);
+  const API = process.env.REACT_APP_API_URL;
+
+  try {
+    // พยายามลบด้วย DELETE ก่อน
+    let res = await fetch(`${API}/data_management/${searchTopic}/${row.id}`, { method: "DELETE" })
+
+    // ถ้าไม่ได้ (เช่น 404/405) ลอง fallback เป็น POST /delete/
+    if (!res.ok) {
+      res = await fetch(`${API}/data_management/${searchTopic}/delete/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+    }
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.detail || "Delete failed");
+    }
+
+    // ลบออกจาก state ทันที
+    setShowData((prev) => prev.filter((r) => r.id !== id));
+    alert("✅ ลบสำเร็จ");
+  } catch (err) {
+    console.error("❌ Delete error:", err);
+    alert(`❌ ลบไม่สำเร็จ: ${err.message || err}`);
+  } finally {
+    setDeletingId(null);
+  }
+};
 
 
   return (
@@ -373,14 +420,27 @@ export default function UploadPlanningPage() {
                 {Object.keys(showData[0]).map((key, idx) => (
                   <TableCell key={idx}>{key}</TableCell>
                 ))}
+                {activeTab === "MASTER" && <TableCell>ACTIONS</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
               {showData.map((row, i) => (
-                <TableRow key={i}>
+                <TableRow key={row.id ?? i}>
                   {Object.values(row).map((val, j) => (
-                    <TableCell key={j}>{val}</TableCell>
+                    <TableCell key={j}>{String(val)}</TableCell>
                   ))}
+                  {activeTab === "MASTER" && (
+                    <TableCell>
+                      <Button
+                        size="small"
+                        color="error"
+                        onClick={() => handleDeleteRow(row)}
+                        disabled={deletingId === row.id}
+                      >
+                        {deletingId === row.id ? "deleting..." : "delete"}
+                      </Button>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>

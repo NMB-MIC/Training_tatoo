@@ -7,7 +7,8 @@ import {
 } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import AssignmentIcon from '@mui/icons-material/Assignment';
-import DashboardIcon from '@mui/icons-material/Dashboard'; // เพิ่ม icon Dashboard
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ReportIcon from '@mui/icons-material/Report';
 
 function Navbar() {
   const [value, setValue] = useState(0);
@@ -51,11 +52,11 @@ function Navbar() {
       elevation={3}
     >
       <BottomNavigation value={value} onChange={handleChange} showLabels>
-        <BottomNavigationAction label="หน้าแรก" icon={<HomeIcon />} />
-        <BottomNavigationAction label="คงเหลือสินค้า" icon={<AssignmentIcon />} />
-        <BottomNavigationAction label="123" icon={<AssignmentIcon />} />
+        <BottomNavigationAction label="Upload" icon={<HomeIcon />} />
+        <BottomNavigationAction label="PlanResult" icon={<AssignmentIcon />} />
+        <BottomNavigationAction label="PreviewPlan" icon={<AssignmentIcon />} />
         <BottomNavigationAction label="Dashboard" icon={<DashboardIcon />} />
-        <BottomNavigationAction label="Dashboard" icon={<DashboardIcon />} /> 
+        <BottomNavigationAction label="Report" icon={<ReportIcon />} /> 
       </BottomNavigation>
     </Paper>
   );

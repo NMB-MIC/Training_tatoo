@@ -105,10 +105,12 @@ async def bom_wos(file: UploadFile = File(...), db: Session = Depends(get_db)):
             BomWos.brgNoValue == brg_no,
             BomWos.partNoValue == part_no,
             BomWos.parentPartNo == parent_no,
+            BomWos.partComponentGroup == part_group,
+            BomWos.qty == qty
         ).first()
 
         #if see duplicate data skip
-        if existing and existing.partComponentGroup == part_group and existing.qty == int(qty):
+        if existing:
             skipped += 1
             skipped_rows.append(row)
             continue
@@ -1343,20 +1345,20 @@ async def upload_monthy_files(
 
     #insert KpiSetup
     for row in kpi_setup_df.to_dict(orient="records"):
-        machineTypeId = row.get("machineType")
+        machineId = row.get("machineGroup")
         setupAverage = row.get("setupAverage")
         maxSetUpPerDay = row.get("maxSetUpPerDay")
 
-        #find machineType.id
-        machine_type_obj = db.query(MachineType).filter(MachineType.machineType == machineTypeId).first()
-        if not machine_type_obj:
-            print(f"❌ MachineType not found for machineType: {machineTypeId}")
+        #find machine.id
+        machine_obj = db.query(Machine).filter(Machine.machineGroup == machineId).first()
+        if not machine_obj:
+            print(f"❌ MachineType not found for machineType: {machineId}")
             continue    
 
         #insert new record
         new_layout = KpiSetup(
             rev=rev,
-            machineTypeId=machine_type_obj.id,
+            machineTypeId=machine_obj.id,
             setupAverage=setupAverage,
             maxSetUpPerDay=maxSetUpPerDay
         )
@@ -1459,7 +1461,7 @@ def get_all_machineNotAvailable(db: Session = Depends(get_db)):
 @app.get("/data_management/productionPlan/", response_model=list[dict])
 def get_all_productionPlan(db: Session = Depends(get_db)):
     #select last rev
-    max_rev = db.query(func.max(KpiProduction.rev)).scalar()
+    max_rev = db.query(func.max(ProductionPlan.rev)).scalar()
     if max_rev is None:
         return []
     #select productionPlan
@@ -1477,7 +1479,7 @@ def get_all_productionPlan(db: Session = Depends(get_db)):
 @app.get("/data_management/kpiSetup/", response_model=list[dict])
 def get_all_kpiSetup(db: Session = Depends(get_db)):
     #select last rev
-    max_rev = db.query(func.max(KpiProduction.rev)).scalar()
+    max_rev = db.query(func.max(KpiSetup.rev)).scalar()
     if max_rev is None:
         return []
     #select kpisetup
@@ -1520,7 +1522,7 @@ def get_all_kpiProduction(db: Session = Depends(get_db)):
 @app.get("/data_management/workingDate/", response_model=list[dict])
 def get_all_workingDate(db: Session = Depends(get_db)):
     #select last rev
-    max_rev = db.query(func.max(KpiProduction.rev)).scalar()
+    max_rev = db.query(func.max(WorkingDate.rev)).scalar()
     if max_rev is None:
         return []
     #select workingDate
@@ -1850,8 +1852,103 @@ def list_roles(db: Session = Depends(get_db)):
 # @app.post("/users", response_model=dict)
 # def create_user(db: Session = Depends(get_db)):
 
+# ---------- MASTER: bomWos ----------
+@app.delete("/data_management/bomWos/{item_id}")
+def delete_bomwos(item_id: int, db: Session = Depends(get_db)):
+    obj = db.get(BomWos, item_id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="BomWos not found")
+    db.delete(obj)
+    db.commit()
+    return {"status": "success", "deleted": 1, "id": item_id}
 
 
+# ---------- MASTER: machineLayout ----------
+@app.delete("/data_management/machineLayout/{item_id}")
+def delete_machine_layout(item_id: int, db: Session = Depends(get_db)):
+    obj = db.get(MachineLayout, item_id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="MachineLayout not found")
+    try:
+        db.delete(obj)
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        # ถ้ามี FK constraint ให้ลบในตารางลูกก่อน หรือเปิด ondelete='CASCADE'
+        raise HTTPException(status_code=409, detail="Cannot delete due to foreign key references")
+    return {"status": "success", "deleted": 1, "id": item_id}
+
+
+# ---------- MASTER: machineGroup (ลบในตาราง Machine) ----------
+@app.delete("/data_management/machineGroup/{item_id}")
+def delete_machine(item_id: int, db: Session = Depends(get_db)):
+    obj = db.get(Machine, item_id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Machine not found")
+    try:
+        db.delete(obj)
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=409, detail="Cannot delete due to foreign key references")
+    return {"status": "success", "deleted": 1, "id": item_id}
+
+
+# ---------- MASTER: fac1 / fac3 / sleeveAndThrustBrg (ใช้ PartAssy ตัวเดียวกัน) ----------
+@app.delete("/data_management/fac1/{item_id}")
+def delete_fac1(item_id: int, db: Session = Depends(get_db)):
+    obj = db.get(PartAssy, item_id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="PartAssy (fac1) not found")
+    db.delete(obj)
+    db.commit()
+    return {"status": "success", "deleted": 1, "id": item_id}
+
+@app.delete("/data_management/fac3/{item_id}")
+def delete_fac3(item_id: int, db: Session = Depends(get_db)):
+    obj = db.get(PartAssy, item_id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="PartAssy (fac3) not found")
+    db.delete(obj)
+    db.commit()
+    return {"status": "success", "deleted": 1, "id": item_id}
+
+@app.delete("/data_management/sleeveAndThrustBrg/{item_id}")
+def delete_sleeve_thrust(item_id: int, db: Session = Depends(get_db)):
+    obj = db.get(PartAssy, item_id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="PartAssy (sleeveAndThrustBrg) not found")
+    db.delete(obj)
+    db.commit()
+    return {"status": "success", "deleted": 1, "id": item_id}
+
+
+# ---------- MASTER: toolLimitAndCapa ----------
+# ใน upload คุณสร้าง Capacity แล้วผูก JoinLimitAssy
+# เพื่อลบแบบง่าย: ลบ JoinLimitAssy ที่ชี้ capacity ก่อน แล้วค่อยลบ Capacity
+@app.delete("/data_management/toolLimitAndCapa/{item_id}")
+def delete_capacity(item_id: int, db: Session = Depends(get_db)):
+    cap = db.get(Capacity, item_id)
+    if not cap:
+        raise HTTPException(status_code=404, detail="Capacity not found")
+
+    # ลบความสัมพันธ์ก่อน (ถ้าใช้ FK cascade ก็สามารถข้ามสองบรรทัดนี้ได้)
+    db.query(JoinLimitAssy).filter(JoinLimitAssy.capacityId == item_id).delete(synchronize_session=False)
+
+    db.delete(cap)
+    db.commit()
+    return {"status": "success", "deleted": 1, "id": item_id}
+
+
+# ---------- BY MONTH: workingDate ----------
+@app.delete("/data_management/workingDate/{item_id}")
+def delete_working_date(item_id: int, db: Session = Depends(get_db)):
+    obj = db.get(WorkingDate, item_id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="WorkingDate not found")
+    db.delete(obj)
+    db.commit()
+    return {"status": "success", "deleted": 1, "id": item_id}
 
 
 

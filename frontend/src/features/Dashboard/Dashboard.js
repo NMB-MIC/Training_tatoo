@@ -163,9 +163,6 @@ export default function Dashboard() {
 
       <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Typography sx={{ fontWeight: "bold" }}>
-            แหล่งข้อมูล: /report/plan & /report/actual
-          </Typography>
           <Box sx={{ flex: 1 }} />
           <Button variant="contained" onClick={loadData} disabled={loading}>
             {loading ? "LOADING..." : "RELOAD"}
