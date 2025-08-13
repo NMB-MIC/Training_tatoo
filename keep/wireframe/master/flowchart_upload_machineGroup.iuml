@@ -1,0 +1,105 @@
+@startuml
+title Flowchart Upload MachineGroup - release v0.0.2
+
+start
+:Input file;
+
+if (Filename starts with 'machineGroup'?) then (yes)
+  if (Filetype is .csv or .xlsx?) then (yes)
+    :Read file into DataFrame (CSV/XLSX);
+    :Drop columns matched '^Unnamed';
+
+    ' -------- Header check (loop) --------
+    :required = [machineGroup, machineType, machineNo];
+    while (More required headers?) is (yes)
+      :col = next required;
+      if (col exists in DataFrame headers?) then (yes)
+      else
+        :Alert: Missing required column '{col}';
+        stop
+      endif
+    endwhile (no)
+    ' ------------------------------------
+
+    ' -------- Empty check (loop) --------
+    :rowIndex = 1;
+    while (More rows to check empty?) is (yes)
+      :row = next;
+      if (Any of [machineGroup, machineType, machineNo] empty?) then (yes)
+        :Alert: Empty cell at row {rowIndex};
+        stop
+      else
+        :rowIndex = rowIndex + 1;
+      endif
+    endwhile (no)
+    ' ------------------------------------
+
+    ' -------- Unknown check (loop) --------
+    :rowIndex = 1;
+    while (More rows to check unknown?) is (yes)
+      :row = next;
+      if ("unknown" (case-insensitive) in any field?) then (yes)
+        :Alert: Found 'unknown' at row {rowIndex};
+        stop
+      else
+        :rowIndex = rowIndex + 1;
+      endif
+    endwhile (no)
+    ' -------------------------------------
+
+    :inserted=0; failed_rows=[]; inserted_rows=[];
+
+    while (More rows to process?) is (yes)
+      :row, rowIndex = next;
+      :machine_group = row['machineGroup'];\n:machine_type = row['machineType'];\n:machine_no = row['machineNo'];
+
+      if (All three present?) then (yes)
+
+        ' ---------- Upsert MachineType (commit inside loop) ----------
+        if (Find MachineType by machineType) then (found)
+          :machine_type_obj = found;
+        else
+          :Insert MachineType(machineType=machine_type);\ncommit; refresh -> machine_type_obj;
+        endif
+        ' -------------------------------------------------------------
+
+        ' ---------- FK: MachineLayout by machineNo ----------
+        if (Find MachineLayout where machineNo==machine_no) then (found)
+          :machine_layout_obj = found;
+
+          ' ---------- Insert Machine (no duplicate check) ----------
+          :Add Machine(\nmachineGroup=machine_group,\nmachineTypeId=machine_type_obj.id,\nmachineLayoutId=machine_layout_obj.id) to session;
+          :inserted++; inserted_rows += row;
+          ' ---------------------------------------------------------
+
+        else
+          :failed_rows += {row: rowIndex+1, reason: "MachineNo not found in MachineLayout"};
+          ' skip row
+        endif
+
+      else
+        :failed_rows += {row: rowIndex+1, reason: "Missing required data"};
+        ' skip row
+      endif
+    endwhile (no)
+
+  
+    if (Commit OK?) then (yes)
+      :Return {"status":"success", inserted, skipped};
+      stop
+    else (DB error on commit)
+      :Rollback Transaction;
+      :Alert: DB error on commit;\nUpload failed;
+      stop
+    endif
+    stop
+
+  else
+    :Alert: Filetype must be .csv or .xlsx;
+    stop
+  endif
+else
+  :Alert: Filename must start with 'machineGroup';
+  stop
+endif
+@enduml

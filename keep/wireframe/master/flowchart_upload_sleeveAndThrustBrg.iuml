@@ -1,0 +1,99 @@
+@startuml
+title Flowchart Upload sleeveAndThrustBrg - release v0.0.2
+
+start
+:Input file;
+
+if (Filename starts with 'sleeveAndThrustBrg'?) then (yes)
+  if (Filetype is .csv or .xlsx?) then (yes)
+    :Read file into DataFrame (CSV/XLSX);
+    :Drop columns matched '^Unnamed';
+
+    ' -------- Header check (loop) --------
+    ' (ตามกติกา: required = [brgNoValue, groupBrgNoValue])
+    :required = [brgNoValue, groupBrgNoValue];
+    while (More required headers?) is (yes)
+      :col = next required;
+      if (col exists in DataFrame headers?) then (yes)
+      else
+        :Alert: Missing required column '{col}';
+        stop
+      endif
+    endwhile (no)
+    ' ------------------------------------
+
+    ' -------- Empty check (loop) --------
+    :rowIndex = 1;
+    while (More rows to check empty?) is (yes)
+      :row = next;
+      if (Any required field empty in row?) then (yes)
+        :Alert: Empty cell at row {rowIndex};
+        stop
+      else
+        :rowIndex = rowIndex + 1;
+      endif
+    endwhile (no)
+    ' ------------------------------------
+
+    ' -------- Unknown check (loop) --------
+    :rowIndex = 1;
+    while (More rows to check unknown?) is (yes)
+      :row = next;
+      if ("unknown" (case-insensitive) in any field?) then (yes)
+        :Alert: Found 'unknown' at row {rowIndex};
+        stop
+      else
+        :rowIndex = rowIndex + 1;
+      endif
+    endwhile (no)
+    ' -------------------------------------
+
+    :inserted=0; skipped_dup=0; skipped_fk=0; failed_rows=[];
+    :Begin DB Transaction;
+
+    while (More rows to insert?) is (yes)
+      :row, rowIndex = next;
+      :brgNoValue = row['brgNoValue'];\n:groupBrgNoValue = row['groupBrgNoValue'];
+
+      ' ---------- FK check (collect & skip) ----------
+      if (Exists in BomWos by (brgNoValue AND groupBrgNoValue)?) then (yes)
+        :bomWosId = BomWos.id;
+
+        ' ---------- Duplicate check (optional) ----------
+        if (Exists exact match in PartAssy by\n[bomWosId AND partSleeveAndThrustBrg='1']?) then (yes)
+          :skipped_dup++;\nskip row;
+        else (no)
+          if (Insert PartAssy(bomWosId=bomWosId,\npartSleeveAndThrustBrg="1") OK?) then (yes)
+            :inserted++;
+          else (DB error)
+            :Rollback Transaction;
+            :Alert: DB error while inserting;\nUpload failed;
+            stop
+          endif
+        endif
+      else
+        :failed_rows += {row: rowIndex+1,\nreason: "brgNoValue+groupBrgNoValue not found in BomWos"};
+        :skipped_fk++;\nskip row;
+      endif
+      ' -----------------------------------------------
+
+    endwhile (no)
+
+    if (Commit OK?) then (yes)
+      :Return {"status":"success", Inserted=inserted,\nDuplicates=skipped_dup, FK_missing=skipped_fk,\nfailed_rows=failed_rows};
+      stop
+    else (DB error on commit)
+      :Rollback Transaction;
+      :Alert: DB error on commit;\nUpload failed;
+      stop
+    endif
+
+  else
+    :Alert: Filetype must be .csv or .xlsx;
+    stop
+  endif
+else
+  :Alert: Filename must start with 'sleeveAndThrustBrg';
+  stop
+endif
+@enduml

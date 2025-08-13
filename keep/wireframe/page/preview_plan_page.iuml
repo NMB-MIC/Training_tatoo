@@ -1,0 +1,25 @@
+@startsalt
+{
+    title PREVIEW PLAN PAGE
+
+PARAMETER ADJUSTING LIST
+ {T#
++ TOPICS|TEMPLATE|TEMPLATE VERSION | FILE | UPLOAD 
++ WORKING DAY|[dowload]| v.0.0.1|[file] |[upload]
++ CAPACITY|[dowload]| v.0.0.1|[file] | [upload]
+}
+
+PLAN TYPE | ^Select^FIRST PLAN^REPLAN^
+
+PLAN MODE LOGIC
+() Clear pass due
+() Production target
+() Custom %Clear pass due | ^100^
+() Custom %Production target | ^100^
+
+[CREATE PLAN]
+---
+
+release v0.0.1
+}
+@endsalt

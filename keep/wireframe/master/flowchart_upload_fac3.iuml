@@ -1,0 +1,94 @@
+@startuml
+title Flowchart Upload Fac3 - release v0.0.1
+
+start
+:Input file;
+
+if (Filename starts with 'fac3'?) then (yes)
+  if (Filetype is .csv or .xlsx?) then (yes)
+    :Read file into DataFrame (CSV/XLSX);
+    :Drop columns matched '^Unnamed';
+
+    ' -------- Header check (loop) --------
+    :required = [brgNoValue, groupBrgNoValue];
+    while (More required headers?) is (yes)
+      :col = next required;
+      if (col exists in DataFrame headers?) then (yes)
+      else
+        :Alert: Missing required column '{col}';
+        stop
+      endif
+    endwhile (no)
+    ' ------------------------------------
+
+    ' -------- Empty check (loop) --------
+    :rowIndex = 1;
+    while (More rows to check empty?) is (yes)
+      :row = next;
+      if (Any required field empty in row?) then (yes)
+        :Alert: Empty cell at row {rowIndex};
+        stop
+      else
+        :rowIndex = rowIndex + 1;
+      endif
+    endwhile (no)
+    ' ------------------------------------
+
+    ' -------- Unknown check (loop) --------
+    :rowIndex = 1;
+    while (More rows to check unknown?) is (yes)
+      :row = next;
+      if ("unknown" (case-insensitive) in any field?) then (yes)
+        :Alert: Found 'unknown' at row {rowIndex};
+        stop
+      else
+        :rowIndex = rowIndex + 1;
+      endif
+    endwhile (no)
+    ' -------------------------------------
+
+    :inserted=0; failed_rows=[]; inserted_rows=[];
+    :Begin DB Transaction;
+
+    while (More rows to insert?) is (yes)
+      :row, rowIndex = next;
+      :brgNoValue = row['brgNoValue'];\n:groupBrgNoValue = row['groupBrgNoValue'];
+
+      if (Both brgNoValue AND groupBrgNoValue present?) then (yes)
+        ' ---- FK lookup: BomWos by brgNoValue (ตามโค้ด fac1) ----
+        if (Find BomWos WHERE brgNoValue == value) then (found)
+          if (Insert PartAssy(bomWosId=bom.id, partFac3="1") OK?) then (yes)
+            :inserted++; inserted_rows += row;
+          else (DB error)
+            :Rollback Transaction;
+            :Alert: DB error while inserting;\nUpload failed;
+            stop
+          endif
+        else
+          :failed_rows += {row: rowIndex+1, reason: "brgNoValue not found in BomWos"};
+          ' skip row
+        endif
+      else
+        :failed_rows += {row: rowIndex+1, reason: "Missing required data"};
+        ' skip row
+      endif
+    endwhile (no)
+
+    if (Commit OK?) then (yes)
+      :Return {"status":"success", "inserted"=inserted, "failed_rows"=failed_rows};
+      stop
+    else (DB error on commit)
+      :Rollback Transaction;
+      :Alert: DB error on commit;\nUpload failed;
+      stop
+    endif
+
+  else
+    :Alert: Invalid file type (must be CSV/XLSX);
+    stop
+  endif
+else
+  :Alert: Filename must start with 'fac3';
+  stop
+endif
+@enduml

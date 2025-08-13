@@ -1,0 +1,6 @@
+BE -> DB : Insert_balanceOrderMidSmall_records
+BE -> DB : Insert_machineNotAvailable_records
+BE -> DB : Insert_productionPlan_records
+BE -> DB : Insert_kpiSetup_records
+BE -> DB : Insert_kpiProduction_records
+BE -> DB : Insert_workingDate_records

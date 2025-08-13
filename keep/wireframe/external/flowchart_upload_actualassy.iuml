@@ -1,0 +1,117 @@
+@startuml
+title Flowchart Upload ActualAssy - release v0.0.2
+
+start
+:Input file;
+
+if (Filename starts with 'actualAssy'?) then (yes)
+  if (Filetype is .csv or .xlsx?) then (yes)
+    :Read file into DataFrame (CSV/XLSX);
+    :Drop columns matched '^Unnamed';
+
+    ' -------- Header check (loop) --------
+    :required = [machineNo, brgNoValue, startDate, endDate, actualOutput];
+    while (More required headers?) is (yes)
+      :col = next required;
+      if (col exists in DataFrame headers?) then (yes)
+      else
+        :Alert: Missing required column '{col}';
+        stop
+      endif
+    endwhile (no)
+
+    ' -------- Empty check (loop) --------
+    :rowIndex = 1;
+    while (More rows to check empty?) is (yes)
+      :row = next;
+      if (Any of [machineNo, brgNoValue, startDate, endDate, actualOutput] empty?) then (yes)
+        :Alert: Empty cell at row {rowIndex};
+        stop
+      else
+        :rowIndex = rowIndex + 1;
+      endif
+    endwhile (no)
+
+    ' -------- Number check for actualOutput (loop) --------
+    :rowIndex = 1;
+    while (More rows to check number?) is (yes)
+      :row = next;
+      if (actualOutput is numeric and no commas?) then (yes)
+        :rowIndex = rowIndex + 1;
+      else
+        :Alert: Invalid 'actualOutput' at row {rowIndex};
+        stop
+      endif
+    endwhile (no)
+
+    ' -------- Date check for startDate & endDate (loop) --------
+    :rowIndex = 1;
+    while (More rows to check date?) is (yes)
+      :row = next;
+      if (startDate & endDate valid format?) then (yes)
+        :rowIndex = rowIndex + 1;
+      else
+        :Alert: Invalid date at row {rowIndex};
+        stop
+      endif
+    endwhile (no)
+
+    ' -------- Unknown check (loop) --------
+    :rowIndex = 1;
+    while (More rows to check unknown?) is (yes)
+      :row = next;
+      if ("unknown" (case-insensitive) appears in any field?) then (yes)
+        :Alert: Found 'unknown' at row {rowIndex};
+        stop
+      else
+        :rowIndex = rowIndex + 1;
+      endif
+    endwhile (no)
+
+    ' -------- Insert section (per code) --------
+    :inserted=0; inserted_rows=[]; failed_rows=[];
+    :Get last rev of ProductionPlanActual -> last_rev;
+    :rev = (last_rev ? last_rev + 1 : 1);
+
+    while (More rows to insert?) is (yes)
+      :row = next;
+      :machineNo = row.machineNo;\nbrgNoValue = row.brgNoValue;\nstart = row.startDate;\nend = row.balanceOrder; ' per code\nout = row.actualOutput;
+
+      ' FK: BomWos by brgNoValue
+      if (Find BomWos where brgNoValue==brgNoValue) then (found)
+        ' FK: MachineLayout by machineNo
+        if (Find MachineLayout where machineNo==machineNo) then (found)
+          ' FK: Machine by machineLayoutId
+          if (Find Machine where machineLayoutId==MachineLayout.id) then (found)
+            :Add BalanceOrderMidSmall(\n rev=rev, startDate=start, endDate=end, actualOutput=out,\n bomWosId=BomWos.id, machineId=Machine.id ) to session; ' per code
+            :inserted++; inserted_rows += row;
+          else
+            :print "❌ Machine not found for machineTypeId: {machine_obj.id}";\nskip row;
+          endif
+        else
+          :print "❌ MachineType not found for machineNo: {machineNo}";\nskip row;
+        endif
+      else
+        :failed_rows += {rowIndex+2, "wosNo '{brgNoValue}' not found in BomWos"};\nskip row;
+      endif
+    endwhile (no)
+
+  ' ================= Final Commit =================
+  if (Commit OK?) then (yes)
+    :Return success + summary (each dataset inserted + failed/logged);
+    stop
+  else (DB error on commit)
+    :Rollback Transaction;
+    :Alert: DB error on final commit;\nProcess failed;
+    stop
+  endif
+
+  else
+    :Alert: Filetype must be .csv or .xlsx;
+    stop
+  endif
+else
+  :Alert: Filename must start with 'actualAssy';
+  stop
+endif
+@enduml

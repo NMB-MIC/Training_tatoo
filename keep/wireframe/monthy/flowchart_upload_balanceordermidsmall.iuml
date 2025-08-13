@@ -1,0 +1,81 @@
+@startuml
+title Flowchart Validate BalanceOrderMidSmall - v0.0.2
+
+start
+:Input file;
+
+if (Filename starts with 'balanceOrderMidSmall'?) then (yes)
+  if (Filetype is .csv or .xlsx?) then (yes)
+    :Read file into DataFrame (CSV/XLSX);
+    :Drop columns matched '^Unnamed';
+
+    ' -------- Header check (loop) --------
+    :required = [targetPlanMonth, orderNo, dueDate, balanceOrder, partGroup, wosNo];
+    while (More required headers?) is (yes)
+      :col = next required;
+      if (col exists in DataFrame headers?) then (yes)
+      else
+        :Alert: Missing required column '{col}';
+        stop
+      endif
+    endwhile (no)
+
+    ' -------- Empty check (loop) --------
+    :rowIndex = 1;
+    while (More rows to check empty?) is (yes)
+      :row = next;
+      if (Any required field empty in row?) then (yes)
+        :Alert: Empty cell at row {rowIndex};
+        stop
+      else
+        :rowIndex = rowIndex + 1;
+      endif
+    endwhile (no)
+
+    ' -------- Number check (loop) --------
+    :rowIndex = 1;
+    while (More rows to check numbers?) is (yes)
+      :row = next;
+      if (balanceOrder is numeric and no commas?) then (yes)
+        :rowIndex = rowIndex + 1;
+      else
+        :Alert: Invalid 'balanceOrder' at row {rowIndex} (no comma allowed);
+        stop
+      endif
+    endwhile (no)
+
+    ' -------- Date check (loop) --------
+    :rowIndex = 1;
+    while (More rows to check date?) is (yes)
+      :row = next;
+      if (dueDate valid format?
+[dd/mm/yyyy, d/m/yyyy, dd/m/yyyy, d/mm/yyyy]) then (yes)
+        :rowIndex = rowIndex + 1;
+      else
+        :Alert: Invalid 'dueDate' at row {rowIndex};
+        stop
+      endif
+    endwhile (no)
+
+    ' -------- Unknown check (loop) --------
+    :rowIndex = 1;
+    while (More rows to check unknown?) is (yes)
+      :row = next;
+      if ("unknown" (case-insensitive) in any field?) then (yes)
+        :Alert: Found 'unknown' at row {rowIndex};
+        stop
+      else
+        :rowIndex = rowIndex + 1;
+      endif
+    endwhile (no)
+    stop
+  else
+    :Alert: Invalid file type (must be CSV/XLSX);
+    stop
+  endif
+else
+  :Alert: Filename must start with 'balanceOrderMidSmall';
+  stop
+endif
+
+@enduml

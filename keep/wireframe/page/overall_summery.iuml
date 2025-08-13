@@ -1,0 +1,34 @@
+@startsalt
+{
+    title Summary
+
+{T#
++ DUE DATE        | PASS       | 2025/07     | 2025/08     | 2025/09     | 2025/10     | OVER
++ Balance order   | 10,500,000 | 39,000,000  | 42,000,000  | 53,000,000  | 61,300,000  | 23,000,000
++ wos q'ty        | 360        | 735         | 823         | 900         | 970         | 410
++ Plan target     | 10,500,000 | 30,000,000  | 1,250,000   | 90,000      | -           | -
++ wos q'ty        | 360        | 719         | 11          | 3           | -           | -
++ diff            | -          | 9,000,000   | 40,750,000  | 52,910,000  | 61,300,000  | 23,000,000
++ wos q'ty diff   | -          | 16          | 812         | 897         | 970         | 410
+}
+Production Target
+{T#
++ Target/day               | Avg. plan/day | Total target | Total plan target
++ Auto_machine_daily_target | 1,430,000     |        -       |  -
++ Manual_daily_target        | 270,000       |       -        | -
+}
+Set Up Plan
+{T#
++ Machine | maxSetUp/day | Plan/day | diff
++ AGL     | 2            | 2        | 0
++ FFL     | 1            | 2        | -1
++ AMT     | 1            | 2        | -1
+}
+Lost Time (hrs.)
+{T#
++ Type           | Hours
++ Set up time    | -
++ Wait part      | -
+}
+}
+@endsalt

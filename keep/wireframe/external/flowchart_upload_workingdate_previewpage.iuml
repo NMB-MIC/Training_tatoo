@@ -1,0 +1,47 @@
+@startuml
+title Flowchart Upload WorkingDate PreviewPlan - release v0.0.1
+start
+:Input file;
+
+if (Filename == 'workingDate'?) then (yes)
+  if (Filetype is CSV or XLSX?) then (yes)
+    if (Column 1 == 'workingDate'?) then (yes)
+      if (Column 2 == 'workingHr'?) then (yes)
+
+        :Loop through each row;
+
+        if (Row has NaN or 'unknown'?) then (yes)
+          :Alert: Found NaN or 'unknown' in row;
+          stop
+        endif
+
+        if (workingDate format valid?\n[dd/mm/yyyy, d/m/yyyy, dd/m/yyyy, d/mm/yyyy]) then (yes)
+
+          :Get last rev WorkingDate;
+          :Insert into WorkingDate;
+          :Alert: Upload success;
+          stop
+
+        else
+          :Alert: Invalid date format;
+          stop
+        endif
+
+      else
+        :Alert: Column 2 must be 'workingHr';
+        stop
+      endif
+    else
+      :Alert: Column 1 must be 'workingDate';
+      stop
+    endif
+
+  else
+    :Alert: Invalid file type (must be CSV/XLSX);
+    stop
+  endif
+else
+  :Alert: Filename must be 'workingDate';
+  stop
+endif
+@enduml

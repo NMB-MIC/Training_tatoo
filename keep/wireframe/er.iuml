@@ -1,0 +1,241 @@
+@startuml
+skinparam linetype polyline
+title System Diagram - release v0.0.1
+entity BomWos {
+  * id : int
+  --
+  registerAt : datetime
+  wosNo : string
+  brgNoValue : string
+  partNoValue : string
+  partComponentGroup : string
+  qty : int
+  parentPartNo : string
+}
+
+entity PartAssy {
+  * id : int
+  --
+  registerAt : datetime
+  updatedAt : datetime
+  bomWosId : int
+  sleeveAndThrustBrg : string
+  partFac1 : string
+  partFac3 : string
+}
+
+entity BalanceOrderMidSmall {
+  * id : int
+  --
+  registerAt : datetime
+  targetPlanMonth : str
+  orderNo : string
+  dueDate : date
+  balanceOrder : int
+  partGroup : string
+  rev : int
+  bomWosId : int
+}
+
+entity ProductionPlan {
+  * id : int
+  --
+  registerAt : datetime
+  rev : int
+  machineId : int
+  bomWosId : int
+}
+
+entity MachineNoAvailable {
+  * id : int
+  --
+  registerAt : datetime
+  machineId : int
+  rev : int
+}
+
+entity MachineLayout {
+  * id : int
+  --
+  registerAt : datetime
+  updatedAt : datetime
+  lineNo : string
+  machineNo : string
+  locationNo : string
+}
+
+entity Machine {
+  * id : int
+  --
+  registerAt : datetime
+  updatedAt : datetime
+  machineGroup : string
+  machineTypeId : int
+  machineLayoutId : int
+}
+
+entity MachineType {
+  * id : int
+  --
+  registerAt : datetime
+  updatedAt : datetime
+  machineType : string
+}
+
+entity KplSetup {
+  * id : int
+  --
+  registerAt : datetime
+  machineId : int
+  setupAverage : float
+  maxSetUpPerDay : int
+  rev : int
+}
+
+entity Capacity {
+  * id : int
+  --
+  registerAt : datetime
+  updatedAt : datetime
+  machineId : int
+  bomWosId : int
+  capaDay : int
+  utilizeMc : float
+  cycleTime : float
+}
+
+entity WorkingDate {
+  * id : int
+  --
+  registerAt : datetime
+  workingDate : datetime
+  workingHr : int
+  rev : int
+}
+
+entity User {
+  * id : int
+  --
+  registerAt : datetime
+  updatedAt : datetime
+  employeeId : string
+  fristname : string
+  lastname : string
+  email : string
+  roleId : int
+  divitionId : int
+}
+
+entity Divition {
+  * id : int
+  --
+  registerAt : datetime
+  divitionName : string
+}
+
+entity Role {
+  * id : int
+  --
+  registerAt : datetime
+  roleName : string
+}
+
+entity ProductionPlanActual {
+  * id : int
+  --
+  registerAt : datetime
+  updatedAt : datetime
+  rev : int
+  bomWosId : int
+  machineId : int
+  startDate : date
+  endDate : date
+  actualOutput : int
+}
+
+entity LimitAssy {
+  * id : int
+  --
+  registerAt : datetime
+  updatedAt : datetime
+  limitByType : int
+  limitByGroup : int
+  joinToolingPartNo : string
+}
+
+entity JoinlimitAssy {
+    * id : int
+  --
+  registerAt : datetime
+  capacityId : int
+  limitAssyId : int
+}
+
+entity KpiProduction {
+      * id : int
+  --
+  registerAt : datetime
+  autoMachineDailyTarget : int
+  manualDailyTarget : int
+  
+}
+
+entity DataPlan {
+      * id : int
+  --
+  registerAt : datetime
+  rev : int
+  workingDate : date
+  planTarget : int
+  inMachineContinue : int
+  planType : str
+  machineId : int
+  bomWosId : int
+}
+
+entity ApproveDataPlan {
+      * id : int
+  --
+  registerAt : datetime
+  rev : int
+  workingDate : date
+  planTarget : int
+  inMachineContinue : int
+  planType : str
+  machineId : int
+  bomWosId : int
+}
+
+entity WipAssy {
+      * id : int
+  --
+  registerAt : datetime
+  rev : int
+  processValue : str
+  qty : int
+  wipType : str
+  bomWosId : int
+}
+
+BomWos        "1" ||--o{ "1..n" Capacity
+BomWos        "1" ||--o{ "1..n" PartAssy
+BomWos        "1" ||--o{ "1..n" BalanceOrderMidSmall
+BomWos        "1" ||--o{ "1..n" ProductionPlan
+BomWos        "1" ||--o{ "1..n" ProductionPlanActual
+BomWos        "1" ||--o{ "1..n" DataPlan
+BomWos        "1" ||--o{ "1..n" WipAssy
+Capacity      "1" ||--o{ "1..n" JoinlimitAssy
+LimitAssy     "1" ||--o{ "1..n" JoinlimitAssy
+MachineLayout "1" ||--o{ "1..n" Machine        
+Machine       "1" ||--o{ "1..n" Capacity
+Machine       "1" ||--o{ "1..n" ProductionPlanActual
+Machine       "1" ||--o{ "1..n" ProductionPlan
+Machine       "1" ||--o{ "1..n" MachineNoAvailable
+Machine       "1" ||--o{ "1..n" DataPlan
+Machine       "1" ||--o{ "1..n" KplSetup
+MachineType   "1" ||--o{ "1..n" Machine
+Divition      "1" ||--o{ "1..n" User
+Role          "1" ||--o{ "1..n" User
+
+
+@enduml

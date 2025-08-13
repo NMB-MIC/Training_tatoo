@@ -1,0 +1,34 @@
+@startsalt
+{
+    title UPLOAD PLANNING DATA PAGE
+
+ {/ BY MONTH | <b>MASTER }
+
+MASTER PLANNING DATA LIST
+ 
+ {T#
++ UPDATED AT|TOPICS|TEMPLATE|TEMPLATE VERSION | FILE | UPLOAD 
++ 2025-10-11 10:10 AM|BOM WOS|[dowload]| v.0.0.1|[file] |[upload]
++ 2025-10-11 10:10 AM|MACHINE GROUP|[dowload]| v.0.0.1|[file] | [upload]
++ 2025-10-11 10:10 AM|MACHINE LAYOUT|[dowload]| v.0.0.1|[file] | [upload]
++ 2025-10-11 10:10 AM|TOOL LIMIT&CAPA|[dowload]| v.0.0.1|[file] |[upload]
++ 2025-10-11 10:10 AM|FAC 1|[dowload]| v.0.0.1|[file] | [upload]
++ 2025-10-11 10:10 AM|FAC 3|[dowload]| v.0.0.1|[file] | [upload]
++ 2025-10-11 10:10 AM|SLEEVE&THRUST BRG|[dowload]| v.0.0.1|[file] | [upload]
+}
+
+
+FIND&SEARCH
+
+TOPICS | ^Select^BOM WOS^MACHINE GROUP^MACHINE LAYOUT^TOOL LIMIT&CAPA^FAC 1 ^FAC 3 ^ SLEEVE&THRUST BRG ^
+
+INFORMATION LIST
+{T#
++ wos_no|	brg_no_value|	part_no_value|	part_component_group|qty| PAREANT PART NO
++ AT0421 | DDL-3017K1DSD21MTTP1MN|	1DL-3017HHMTTP2|	OR | 1 |1DL-3017HHMTTP2
+}
+
+
+release v0.0.1
+}
+@endsalt
